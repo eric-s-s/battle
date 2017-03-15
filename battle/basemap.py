@@ -1,23 +1,4 @@
-from enum import Enum
-
-
-class Direction(Enum):
-    N = 'n'
-    S = 's'
-    W = 'w'
-    E = 'e'
-
-    def opposite(self):
-        opposites = {self.N: self.S, self.S: self.N, self.E: self.W, self.W: self.E}
-        return opposites[self]
-
-    def left(self):
-        lefts = {self.N: self.W, self.W: self.S, self.S: self.E, self.E: self.N}
-        return lefts[self]
-
-    def right(self):
-        rights = {self.N: self.E, self.E: self.S, self.S: self.W, self.W: self.N}
-        return rights[self]
+from battle.direction import Direction as Dir
 
 
 class BaseMap(object):
@@ -43,26 +24,8 @@ class BaseMap(object):
         raise NotImplementedError
 
 
-class Tile(object):
-    def __init__(self, map_, map_location):
-        self._map = map_
-        self._map_loc = map_location
-        self._directions = {Direction.N: None,
-                            Direction.S: None,
-                            Direction.E: None,
-                            Direction.W: None}
 
-    def get_units(self):
-        pass
 
-    def get_terrain(self):
-        pass
-
-    def get(self, direction):
-        return self._directions[direction]
-
-    def set(self, tile, direction):
-        self._directions[direction] = tile
 
 
 
