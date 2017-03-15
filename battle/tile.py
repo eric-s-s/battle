@@ -2,9 +2,9 @@ from battle.direction import Direction as Dir
 
 
 class Tile(object):
-    def __init__(self, map_, map_location):
-        self._map = map_
-        self._map_loc = map_location
+    def __init__(self, terrain, units):
+        self._terrain = terrain
+        self._units = units[:]
         self._directions = {Dir.N: None,
                             Dir.S: None,
                             Dir.E: None,
