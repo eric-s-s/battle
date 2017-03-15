@@ -1,3 +1,6 @@
+from battle.direction import Direction as Dir
+
+
 class BaseMap(object):
     def __init__(self):
         self.set_terrain()
@@ -13,4 +16,18 @@ class BaseMap(object):
 
     def adjacent_tiles(self, tile):
         raise NotImplementedError
+
+    def get_terrain(self, tile):
+        raise NotImplementedError
+
+    def get_units(self, tile):
+        raise NotImplementedError
+
+
+
+
+
+
+
+
 
