@@ -1,8 +1,8 @@
 import unittest
 
+from battle.maptools.direction import Direction
+from battle.maptools.tile_grid import TileGrid
 from battle.tile import Tile, TileOccupationError
-from battle.direction import Direction
-from battle.tile_grid import TileGrid
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 

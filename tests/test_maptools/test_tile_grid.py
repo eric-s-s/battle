@@ -1,9 +1,9 @@
 import unittest
 
-from battle.point import Point
-from battle.tile_grid import TileGrid
+from battle.maptools.direction import Direction
+from battle.maptools.point import Point
+from battle.maptools.tile_grid import TileGrid
 from battle.tile import Tile
-from battle.direction import Direction
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 

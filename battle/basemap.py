@@ -1,6 +1,3 @@
-from battle.direction import Direction as Dir
-
-
 class BaseMap(object):
     def __init__(self):
         self.set_terrain()

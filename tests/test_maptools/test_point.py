@@ -1,7 +1,7 @@
 import unittest
 
-from battle.point import Point
-from battle.direction import Direction
+from battle.maptools.direction import Direction
+from battle.maptools.point import Point
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 
@@ -36,19 +36,19 @@ class TestPoint(unittest.TestCase):
 
     def test_north(self):
         point = Point(1, 2)
-        self.assertEqual(point.north(), Point(1, 3))
+        self.assertEqual(point.in_direction(N), Point(1, 3))
 
     def test_south(self):
         point = Point(1, 2)
-        self.assertEqual(point.south(), Point(1, 1))
+        self.assertEqual(point.in_direction(S), Point(1, 1))
 
     def test_east(self):
         point = Point(1, 2)
-        self.assertEqual(point.east(), Point(2, 2))
+        self.assertEqual(point.in_direction(E), Point(2, 2))
 
     def test_west(self):
         point = Point(1, 2)
-        self.assertEqual(point.west(), Point(0, 2))
+        self.assertEqual(point.in_direction(W), Point(0, 2))
 
     def test_plus_x_zero(self):
         point = Point(1, 2)
@@ -79,7 +79,29 @@ class TestPoint(unittest.TestCase):
     def test_plus_pos_neg(self):
         self.assertEqual(Point(1, 1).plus(2, -2), Point(3, -1))
 
+    def test_at_distance_zero(self):
+        answer = Point(-5, 2).at_distance(0)
+        self.assertEqual(answer, [Point(-5, 2)])
 
+    def test_at_distance(self):
+        answer = Point(1, 1).at_distance(1)
+        self.assertIn(Point(2, 1), answer)
+        self.assertIn(Point(0, 1), answer)
+        self.assertIn(Point(1, 2), answer)
+        self.assertIn(Point(1, 0), answer)
+        self.assertEqual(len(answer), 4)
+
+    def test_at_distance_second_test(self):
+        answer = Point(0, 0).at_distance(2)
+        self.assertIn(Point(2, 0), answer)
+        self.assertIn(Point(0, 2), answer)
+        self.assertIn(Point(-2, 0), answer)
+        self.assertIn(Point(0, -2), answer)
+        self.assertIn(Point(1, 1), answer)
+        self.assertIn(Point(1, -1), answer)
+        self.assertIn(Point(-1, 1), answer)
+        self.assertIn(Point(-1, -1), answer)
+        self.assertEqual(len(answer), 8)
 
 
 if __name__ == '__main__':

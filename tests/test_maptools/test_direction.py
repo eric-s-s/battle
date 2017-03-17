@@ -1,6 +1,6 @@
 import unittest
 
-from battle.direction import Direction
+from battle.maptools.direction import Direction
 
 N, W, S, E = Direction.N, Direction.W, Direction.S, Direction.E
 

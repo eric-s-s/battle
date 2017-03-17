@@ -1,4 +1,4 @@
-from battle.direction import Direction as Dir
+from battle.maptools.direction import Direction as Dir
 
 
 class TileOccupationError(ValueError):

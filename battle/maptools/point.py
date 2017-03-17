@@ -1,3 +1,7 @@
+from battle.maptools.direction import Direction
+
+N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
+
 
 class Point(object):
     def __init__(self, x, y):
@@ -20,17 +24,13 @@ class Point(object):
     def __ne__(self, other):
         return not self == other
 
-    def north(self):
-        return Point(self._x, self._y + 1)
+    def __repr__(self):
+        return 'Point({}, {})'.format(self._x, self._y)
 
-    def south(self):
-        return Point(self._x, self._y - 1)
-
-    def east(self):
-        return Point(self._x + 1, self._y)
-
-    def west(self):
-        return Point(self._x - 1, self._y)
+    def in_direction(self, direction):
+        directions = {N: (0, 1), S: (0, -1), E: (1, 0), W: (-1, 0)}
+        del_x, del_y = directions[direction]
+        return self.plus(del_x, del_y)
 
     def plus(self, x, y):
         return Point(self._x + x, self._y + y)
@@ -45,17 +45,12 @@ class Point(object):
         if distance == 0:
             return [self]
         out = []
-        for del_x in range(distance + 1):
-            del_y = distance - del_x
-            if not del_x:
-                out.append(self.plus_y(del_y))
-                out.append(self.plus_y(- del_y))
-            elif not del_y:
-                out.append(self.plus_x(del_x))
-                out.append(self.plus_x(- del_x))
-            else:
-                out.append()
-
+        for del_x in range(-distance, distance + 1):
+            del_y = distance - abs(del_x)
+            out.append(self.plus(del_x, del_y))
+            if del_y != 0:
+                out.append(self.plus(del_x, - del_y))
+        return out
 
 
 
