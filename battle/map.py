@@ -1,7 +1,6 @@
 from battle.maptools.direction import Direction
 from battle.maptools.point import Point
-from battle.tile import Tile, TileOccupationError
-from battle.maptools.tile_grid import TileGrid
+from battle.tile import Tile
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 
@@ -12,9 +11,11 @@ class MapPlacementError(ValueError):
 
 
 class Map(object):
-    def __init__(self, width, height, tiles=None, units=None):
+    def __init__(self, width, height, tiles, units=None):
         self._all_points = Point(0, 0).to_rectangle(width, height)
         self._tiles = dict.fromkeys(self._all_points, None)
+        self._units = dict.fromkeys(self._all_points, None)
+
         self._lay_tiles(tiles)
 
     def _lay_tiles(self, tiles):
@@ -58,23 +59,53 @@ class Map(object):
     def get_tile(self, point):
         return self._tiles[point]
 
-    def get_unit(self, x_y_):
-        return self.get_tile(x_y_).pop_unit()
+    def can_place_unit(self, point):
+        return self.has_tile(point) and self._units[point] is None
 
-    def move_unit(self, point, direction):
-        current = self.get_tile(point)
-        destination = self.get_tile(point.in_direction(direction))
+    def place_unit(self, unit, point):
+        self._raise_unit_placement_error(point)
+        self._units[point] = unit
+        unit.set_point(point)
+
+    def _raise_unit_placement_error(self, point):
+        if not self.can_place_unit(point):
+            raise MapPlacementError('illegal unit placement')
+
+    def get_unit(self, point):
+        return self._units[point]
+
+    def remove_unit(self, unit):
+        if unit.has_point():
+            point = unit.get_point()
+            self._units[point] = None
+            unit.del_point()
+        return unit
+
+    def move_unit(self, unit, direction):
+        movement_pts = 0
+
+        if not unit.has_point():
+            raise MapPlacementError('tried to move unit not on map')
+
+        point = unit.get_point()
+        new_point = point.in_direction(direction)
+        if self.can_place_unit(new_point):
+            movement_pts = 1
+            self.remove_unit(unit)
+            self.place_unit(unit, new_point)
+
+        return movement_pts
 
 
 def separate_tiles(tiles):
-    haves = []
-    have_nots = []
+    has_point = []
+    not_has_point = []
     for tile in tiles:
         if tile.has_point():
-            haves.append(tile)
+            has_point.append(tile)
         else:
-            have_nots.append(tile)
-    return haves, have_nots
+            not_has_point.append(tile)
+    return has_point, not_has_point
 
 
 def _raise_too_many_tiles_error(tiles, points):
