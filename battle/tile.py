@@ -7,32 +7,32 @@ class TileOccupationError(ValueError):
 
 
 class Tile(object):
-    def __init__(self, terrain, unit=None):
+    @classmethod
+    def blank(cls):
+        return cls('blank')
+
+    def __init__(self, terrain, point=None):
         self._terrain = terrain
-        self._unit = unit
+        self._point = point
         self._directions = {Dir.N: None,
                             Dir.S: None,
                             Dir.E: None,
                             Dir.W: None}
 
-    def get_unit(self):
-        return self._unit
+    def get_point(self):
+        return self._point
 
-    def is_empty(self):
-        return self._unit is None
+    def del_point(self):
+        self._point = None
+        for direction in Dir:
+            self.set(None, direction)
 
-    def remove_unit(self):
-        self._unit = None
+    def set_point(self, new_point):
+        self.del_point()
+        self._point = new_point
 
-    def assign_unit(self, unit):
-        if not self.is_empty():
-            raise TileOccupationError('Occupied!')
-        self._unit = unit
-
-    def pop_unit(self):
-        out = self._unit
-        self._unit = None
-        return out
+    def has_point(self):
+        return self._point is not None
 
     def get_terrain(self):
         return self._terrain
@@ -49,19 +49,6 @@ class Tile(object):
     def has_tile(self, direction):
         return not self._directions[direction] is None
 
-    def distance_dictionary(self, distance):
-        if distance == 1:
-            return {0: [self], 1: self.get_all()}
-        base_dict = self.distance_dictionary(distance - 1)
-        to_add = []
-        too_close = base_dict[distance - 2]
-        for tile in base_dict[distance - 1]:
-            raw_list = tile.get_all()
-            exclude = to_add + too_close
-            to_concat = [el for el in raw_list if el not in exclude]
-            to_add += to_concat
-        base_dict[distance] = to_add
-        return base_dict
 
 
 

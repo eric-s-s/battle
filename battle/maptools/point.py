@@ -24,22 +24,33 @@ class Point(object):
     def __ne__(self, other):
         return not self == other
 
+    def __lt__(self, other):
+        return (self.y, self.x) < (other.y, other.x)
+
+    def __le__(self, other):
+        return self == other or self < other
+
+    def __gt__(self, other):
+        return not self <= other
+
+    def __ge__(self, other):
+        return not self < other
+
     def __repr__(self):
         return 'Point({}, {})'.format(self._x, self._y)
 
+    def __str__(self):
+        return '({}, {})'.format(self._x, self._y)
+
+    def __hash__(self):
+        return hash(repr(self))
+
     def in_direction(self, direction):
-        directions = {N: (0, 1), S: (0, -1), E: (1, 0), W: (-1, 0)}
-        del_x, del_y = directions[direction]
+        del_x, del_y = direction.value
         return self.plus(del_x, del_y)
 
     def plus(self, x, y):
         return Point(self._x + x, self._y + y)
-
-    def plus_x(self, x):
-        return self.plus(x, 0)
-
-    def plus_y(self, y):
-        return self.plus(0, y)
 
     def at_distance(self, distance):
         if distance == 0:
@@ -50,7 +61,20 @@ class Point(object):
             out.append(self.plus(del_x, del_y))
             if del_y != 0:
                 out.append(self.plus(del_x, - del_y))
-        return out
+        return sorted(out)
+
+    def to_rectangle(self, x_size, y_size):
+        out = []
+        x_range = get_range(x_size)
+        y_range = get_range(y_size)
+        for del_x in x_range:
+            for del_y in y_range:
+                out.append(self.plus(del_x, del_y))
+        return sorted(out)
 
 
+def get_range(stop_by):
+    if stop_by < 0:
+        return range(0, stop_by, -1)
+    return range(stop_by)
 

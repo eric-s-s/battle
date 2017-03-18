@@ -1,18 +1,10 @@
 import unittest
 
 from battle.maptools.direction import Direction
-from battle.maptools.tile_grid import TileGrid
+from battle.maptools.point import Point
 from battle.tile import Tile, TileOccupationError
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
-
-
-class MockUnit(object):
-    def __init__(self, name):
-        self.name = name
-
-    def copy(self):
-        return MockUnit(self.name)
 
 
 class MockTerrain(object):
@@ -48,20 +40,44 @@ class TestTile(unittest.TestCase):
 
     def setUp(self):
         self.terrain = MockTerrain('terrain')
-        self.unit = MockUnit('unit')
-        self.tile = Tile(self.terrain, self.unit)
+        self.point = Point(1, 1)
+        self.tile = Tile(self.terrain, self.point)
 
     def test_init(self):
         self.assertIs(self.tile.get_terrain(), self.terrain)
-        self.assertIs(self.tile.get_unit(), self.unit)
+        self.assertIs(self.tile.get_point(), self.point)
 
     def test_init_has_no_connections_to_other_tiles(self):
         for direction in Direction:
             self.assertIsNone(self.tile.get(direction))
 
-    def test_init_unit_defaults_to_none(self):
+    def test_init_point_defaults_to_none(self):
         new = Tile(self.terrain)
-        self.assertIsNone(new.get_unit())
+        self.assertIsNone(new.get_point())
+
+    def test_classmethod_blank(self):
+        blank = Tile.blank()
+        self.assertEqual(blank.get_terrain(), 'blank')
+        self.assertEqual(blank.get_all(), [])
+        self.assertFalse(blank.has_point())
+
+    def test_has_point_true(self):
+        self.assertTrue(self.tile.has_point())
+
+    def test_has_point_false(self):
+        self.assertFalse(get_tile('no point').has_point())
+
+    def test_del_point(self):
+        tiles = []
+        for direction in Direction:
+            tile = get_tile(direction.name)
+            tiles.append(tile)
+            self.tile.set(tile, direction)
+        self.assertEqual(self.tile.get_all(), tiles)
+
+        self.tile.del_point()
+        self.assertEqual(self.tile.get_all(), [])
+        self.assertIs(self.tile.get_point(), None)
 
     def test_set(self):
         new = get_tile('test')
@@ -124,70 +140,10 @@ class TestTile(unittest.TestCase):
         self.assertFalse(self.tile.has_tile(E))
         self.assertFalse(self.tile.has_tile(S))
 
-    def test_is_empty_true(self):
-        new = get_tile('test')
-        self.assertTrue(new.is_empty())
 
-    def test_is_empty_false(self):
-        new = get_tile('test', 'a unit')
-        self.assertFalse(new.is_empty())
+def get_tile(terrain_name, point=None):
+    return Tile(MockTerrain(terrain_name), point)
 
-    def test_get_unit(self):
-        no_unit = get_tile('test')
-        self.assertIsNone(no_unit.get_unit())
-        self.assertIs(self.tile.get_unit(), self.unit)
-        self.assertIs(self.tile.get_unit(), self.unit)
-
-    def test_remove_unit(self):
-        no_unit = get_tile('test')
-        no_unit.remove_unit()
-        self.tile.remove_unit()
-        self.assertTrue(no_unit.is_empty())
-        self.assertTrue(self.tile.is_empty())
-
-    def test_pop_unit_empty(self):
-        no_unit = get_tile('test')
-        self.assertIsNone(no_unit.pop_unit())
-        self.assertTrue(no_unit.is_empty())
-
-    def test_pop_unit_non_empty(self):
-        self.assertIs(self.tile.pop_unit(), self.unit)
-        self.assertTrue(self.tile.is_empty())
-
-    def test_assign_unit_to_empty(self):
-        no_unit = get_tile('test')
-        no_unit.assign_unit(self.unit)
-        self.assertIs(no_unit.get_unit(), self.unit)
-        self.assertFalse(no_unit.is_empty())
-
-    def test_assign_unit_to_non_empty_raises_error(self):
-        self.assertRaises(TileOccupationError, self.tile.assign_unit, self.unit)
-
-
-def create_tile_grid(size):
-    to_test = TileGrid(size, size)
-    for x in range(size):
-        for y in range(size):
-            to_test.place_tile(Tile('{}, {}'.format(x, y)), x, y)
-    return to_test
-
-
-def get_middle(test_grid):
-    x, y = test_grid.get_size()
-    return test_grid.get_tile(x // 2, y // 2)
-
-
-def get_tile(terrain_name, unit_name=None):
-    if unit_name is None:
-        unit = None
-    else:
-        unit = MockUnit(unit_name)
-    return Tile(MockTerrain(terrain_name), unit)
-
-
-def connect(tile_1, tile_2, direction):
-    tile_1.set(tile_2, direction)
-    tile_2.set(tile_1, direction.opposite())
 
 
 if __name__ == '__main__':

@@ -59,6 +59,25 @@ class TestTileGrid(unittest.TestCase):
         self.assertIs(n_w_tile.get(S), s_w_tile)
         self.assertIs(s_w_tile.get(N), n_w_tile)
 
+    def test_place_tile_replacing_old_tile_OLD_TILE_STILL_LINKS(self):
+        to_test = TileGrid(2, 2)
+        n_w_tile = Tile('NW', 'unit')
+        n_e_tile = Tile('NE', 'unit')
+        s_w_tile = Tile('SW', 'unit')
+        replacement = Tile('replace')
+
+        to_test.place_tile(n_w_tile, Point(0, 1))
+        to_test.place_tile(n_e_tile, Point(1, 1))
+        to_test.place_tile(s_w_tile, Point(0, 0))
+        to_test.place_tile(replacement, Point(0, 1))
+
+        self.assertIs(replacement.get(E), n_e_tile)
+        self.assertIs(n_e_tile.get(W), replacement)
+        self.assertIs(replacement.get(S), s_w_tile)
+        self.assertIs(s_w_tile.get(N), replacement)
+
+        self.assertIs(n_w_tile.get(E), n_e_tile)
+
     def test_get_tiles_dictionary(self):
         to_test = TileGrid(3, 3)
         my_tile_dic = {}

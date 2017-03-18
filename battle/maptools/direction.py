@@ -2,10 +2,10 @@ from enum import Enum
 
 
 class Direction(Enum):
-    N = 'n'
-    S = 's'
-    W = 'w'
-    E = 'e'
+    N = (0, 1)
+    S = (0, -1)
+    E = (1, 0)
+    W = (-1, 0)
 
     def opposite(self):
         opposites = {self.N: self.S, self.S: self.N, self.E: self.W, self.W: self.E}
@@ -21,5 +21,3 @@ class Direction(Enum):
 
     def __repr__(self):
         return 'Direction.{}'.format(self.name)
-
-
