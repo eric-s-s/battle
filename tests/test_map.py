@@ -75,14 +75,26 @@ class TestMap(unittest.TestCase):
         for point in Point(0, 2).to_rectangle(3, 1):
             self.assertFalse(test_map.has_tile(point))
 
-    # def test_connect(self):
-    #     test_map = Map(2, 2, [Tile('00', Point(0, 0))])
-    #     all_points = [Point(0, 0), Point(1, 0),
-    #                   Point(1, 0), Point(1, 1)]
-    #     for point in all_points[1:]:
-    #         self.assertFalse(test_map.has_tile(point))
-    #
-    #     new_tiles = []
+    def test_connect(self):
+        sw = Tile('a', Point(0, 0))
+        se = Tile('a', Point(1, 0))
+        nw = Tile('a', Point(0, 1))
+        ne = Tile('a', Point(1, 1))
+
+        test_map = Map(2, 2, [sw])
+        all_points = [Point(0, 0), Point(1, 0),
+                      Point(1, 0), Point(1, 1)]
+        for point in all_points[1:]:
+            self.assertFalse(test_map.has_tile(point))
+
+        test_map.connect(nw)
+        self.assertIs(nw.get(Direction.S), sw)
+        self.assertIs(sw.get(Direction.N), nw)
+        test_map.connect(se)
+        test_map.connect(ne)
+        self.assertIs(nw.get(Direction.E), ne)
+        self.assertIs(ne.get(Direction.W), nw)
+
     def test_is_on_map_true(self):
         points = Point(0, 0).to_rectangle(self.width, self.height)
         for point in points:

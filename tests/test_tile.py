@@ -55,7 +55,7 @@ class TestTile(unittest.TestCase):
         new = Tile(self.terrain)
         self.assertIsNone(new.get_point())
 
-    def test_classmethod_blank(self):
+    def test_class_method_blank(self):
         blank = Tile.blank()
         self.assertEqual(blank.get_terrain(), 'blank')
         self.assertEqual(blank.get_all(), [])
