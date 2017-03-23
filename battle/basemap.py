@@ -14,3 +14,17 @@ class BaseMap(object):
     def adjacent_tiles(self, tile):
         raise NotImplementedError
 
+    def get_terrain(self, tile):
+        raise NotImplementedError
+
+    def get_units(self, tile):
+        raise NotImplementedError
+
+
+
+
+
+
+
+
+
