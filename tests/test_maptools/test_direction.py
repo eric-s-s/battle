@@ -1,6 +1,6 @@
 import unittest
 
-from battle.direction import Direction
+from battle.maptools.direction import Direction
 
 N, W, S, E = Direction.N, Direction.W, Direction.S, Direction.E
 
@@ -28,8 +28,8 @@ class TestDirection(unittest.TestCase):
     def test_enum_not_equal_value_or_name(self):
         self.assertNotEqual(N, 'N')
         self.assertNotEqual('N', N)
-        self.assertNotEqual(N, 'n')
-        self.assertNotEqual('n', N)
+        self.assertNotEqual(N, (0, 1))
+        self.assertNotEqual((0, 1), N)
 
     def test_opposite(self):
         self.assertIs(N.opposite(), S)
@@ -55,3 +55,21 @@ class TestDirection(unittest.TestCase):
         self.assertEqual(repr(E), 'Direction.E')
         self.assertEqual(repr(W), 'Direction.W')
 
+    def test_value_N(self):
+        self.assertEqual(N.value, (0, 1))
+
+    def test_value_S(self):
+        self.assertEqual(S.value, (0, -1))
+
+    def test_value_E(self):
+        self.assertEqual(E.value, (1, 0))
+
+    def test_value_W(self):
+        self.assertEqual(W.value, (-1, 0))
+
+    def test_iterator(self):
+        order = [N, S, E, W]
+        index = 0
+        for direction in Direction:
+            self.assertIs(order[index], direction)
+            index += 1
