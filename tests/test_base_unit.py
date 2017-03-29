@@ -1,29 +1,13 @@
 import unittest
+
 from battle.base_unit import BaseUnit
 from battle.maptools.point import Point
-
-
-class MockUnit(BaseUnit):
-    def __init__(self):
-        self.point = None
-
-    def get_point(self):
-        return self.point
-
-    def has_point(self):
-        return self.point is not None
-
-    def set_point(self, point):
-        self.point = point
-
-    def del_point(self):
-        self.point = None
 
 
 class TestBaseUnit(unittest.TestCase):
 
     def setUp(self):
-        self.unit = MockUnit()
+        self.unit = BaseUnit()
 
     def test_unit_inits_with_no_point(self):
         self.assertFalse(self.unit.has_point())

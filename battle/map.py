@@ -1,6 +1,5 @@
 from battle.maptools.direction import Direction
 from battle.maptools.point import Point
-from battle.tile import Tile
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 

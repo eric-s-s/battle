@@ -1,27 +1,10 @@
 import unittest
 
+from battle.base_unit import BaseUnit
 from battle.map import Map, MapPlacementError
-from battle.maptools.point import Point
 from battle.maptools.direction import Direction
+from battle.maptools.point import Point
 from battle.tile import Tile
-
-
-class MockUnit(object):
-    def __init__(self, name, point=None):
-        self.name = name
-        self.point = point
-
-    def get_point(self):
-        return self.point
-
-    def has_point(self):
-        return self.point is not None
-
-    def set_point(self, point):
-        self.point = point
-
-    def del_point(self):
-        self.point = None
 
 
 class TestMap(unittest.TestCase):
@@ -130,22 +113,22 @@ class TestMap(unittest.TestCase):
         self.assertFalse(Map(2, 2, []).can_place_unit(Point(1, 1)))
 
     def test_can_place_unit_false_by_occupied_by_unit(self):
-        self.map.place_unit(MockUnit('test'), Point(1, 1))
+        self.map.place_unit(BaseUnit(), Point(1, 1))
         self.assertFalse(self.map.can_place_unit(Point(1, 1)))
 
     def test_place_unit_error_by_not_on_map(self):
-        self.assertRaises(MapPlacementError, self.map.place_unit, MockUnit('test'), Point(10, 1))
+        self.assertRaises(MapPlacementError, self.map.place_unit, BaseUnit(), Point(10, 1))
 
     def test_place_unit_error_by_no_tile(self):
         test_map = Map(2, 2, [])
-        self.assertRaises(MapPlacementError, test_map.place_unit, MockUnit('test'), Point(1, 1))
+        self.assertRaises(MapPlacementError, test_map.place_unit, BaseUnit(), Point(1, 1))
 
     def test_place_unit_error_by_occupied_by_unit(self):
-        self.map.place_unit(MockUnit('test'), Point(1, 1))
-        self.assertRaises(MapPlacementError, self.map.place_unit, MockUnit('test'), Point(1, 1))
+        self.map.place_unit(BaseUnit(), Point(1, 1))
+        self.assertRaises(MapPlacementError, self.map.place_unit, BaseUnit(), Point(1, 1))
 
     def test_place_unit_sets_unit_point(self):
-        unit = MockUnit('test')
+        unit = BaseUnit()
         self.assertFalse(unit.has_point())
         self.map.place_unit(unit, Point(1, 1))
 
@@ -153,33 +136,33 @@ class TestMap(unittest.TestCase):
         self.assertIs(self.map.get_unit(Point(1, 1)), unit)
 
     def test_remove_unit(self):
-        unit = MockUnit('test')
+        unit = BaseUnit()
         self.map.place_unit(unit, Point(1, 1))
         self.map.remove_unit(unit)
         self.assertTrue(self.map.can_place_unit(Point(1, 1)))
         self.assertFalse(unit.has_point())
 
     def test_move_unit_success_returns_movement_pts(self):
-        unit = MockUnit('test')
+        unit = BaseUnit()
         self.map.place_unit(unit, Point(1, 1))
         movement_pts = self.map.move_unit(unit, Direction.N)
         self.assertEqual(movement_pts, 1)
 
     def test_move_unit_success_moves_unit(self):
-        unit = MockUnit('test')
+        unit = BaseUnit()
         self.map.place_unit(unit, Point(1, 1))
         self.map.move_unit(unit, Direction.N)
         self.assertEqual(unit.get_point(), Point(1, 2))
         self.assertIs(self.map.get_unit(Point(1, 2)), unit)
 
     def test_move_unit_success_removes_from_old_point(self):
-        unit = MockUnit('test')
+        unit = BaseUnit()
         self.map.place_unit(unit, Point(1, 1))
         self.map.move_unit(unit, Direction.N)
         self.assertIsNone(self.map.get_unit(Point(1, 1)))
 
     def test_move_unit_other_directions(self):
-        unit = MockUnit('test')
+        unit = BaseUnit()
         self.map.place_unit(unit, Point(1, 1))
 
         self.map.move_unit(unit, Direction.S)
@@ -192,34 +175,34 @@ class TestMap(unittest.TestCase):
         self.assertEqual(unit.get_point(), Point(1, 0))
 
     def test_move_unit_fail_movement_pts_is_zero(self):
-        unit = MockUnit('test')
-        unit_2 = MockUnit('blocker')
+        unit = BaseUnit()
+        blocker = BaseUnit()
         self.map.place_unit(unit, Point(1, 1))
-        self.map.place_unit(unit_2, Point(1, 2))
+        self.map.place_unit(blocker, Point(1, 2))
 
         movement_pts = self.map.move_unit(unit, Direction.N)
         self.assertEqual(movement_pts, 0)
 
     def test_move_unit_fail_units_do_not_move(self):
-        unit = MockUnit('test')
-        unit_2 = MockUnit('blocker')
+        unit = BaseUnit()
+        blocker = BaseUnit()
         self.map.place_unit(unit, Point(1, 1))
-        self.map.place_unit(unit_2, Point(1, 2))
+        self.map.place_unit(blocker, Point(1, 2))
         self.map.move_unit(unit, Direction.N)
 
         self.assertEqual(unit.get_point(), Point(1, 1))
-        self.assertIs(self.map.get_unit(Point(1, 2)), unit_2)
+        self.assertIs(self.map.get_unit(Point(1, 2)), blocker)
         self.assertIs(self.map.get_unit(Point(1, 1)), unit)
 
     def test_movie_unit_fail_by_no_tile(self):
-        unit = MockUnit('test')
+        unit = BaseUnit()
         test_map = Map(3, 3, [Tile('1, 1', Point(1, 1))])
         test_map.place_unit(unit, Point(1, 1))
         movement_pts = test_map.move_unit(unit, Direction.S)
         self.assertEqual(movement_pts, 0)
 
     def test_movie_unit_fail_by_off_board(self):
-        unit = MockUnit('test')
+        unit = BaseUnit()
         self.map.place_unit(unit, Point(0, 0))
         movement_pts = self.map.move_unit(unit, Direction.S)
         self.assertEqual(movement_pts, 0)
