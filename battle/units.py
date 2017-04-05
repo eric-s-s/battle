@@ -13,6 +13,10 @@ class Soldier(BaseUnit):
         self._weapon = FIST
         super(Soldier, self).__init__()
 
+    @property
+    def movement_pts(self) -> int:
+        return self._current_move
+
     def get_health(self) -> int:
         return self._current_health
 
@@ -36,21 +40,16 @@ class Soldier(BaseUnit):
 
     def heal(self, health_pts: int):
         """cannot heal past max"""
-        raise NotImplementedError
-
-    def move(self, move_pts: int):
-        """cannot move if currentt is max"""
-        raise NotImplementedError
-
-    def can_move(self) -> bool:
-        raise NotImplementedError
-    
-    def reset_move(self):
-        raise NotImplementedError
+        if health_pts < 0:
+            raise ValueError('health_pts can\'t be less than zero')
+        if self.is_dead():
+            return None
+        self._current_health = min(self._current_health + health_pts, self._max_health)
 
     def rest(self):
         """heal and reset_move"""
         raise NotImplementedError
+
 
 
 

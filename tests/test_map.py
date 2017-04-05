@@ -135,6 +135,12 @@ class TestMap(unittest.TestCase):
         self.assertEqual(unit.get_point(), Point(1, 1))
         self.assertIs(self.map.get_unit(Point(1, 1)), unit)
 
+    def test_place_unit_set_unit_map_as_self(self):
+        unit = BaseUnit()
+        self.assertFalse(unit.is_on_map(self.map))
+        self.map.place_unit(unit, Point(1, 1))
+        self.assertTrue(unit.is_on_map(self.map))
+
     def test_remove_unit(self):
         unit = BaseUnit()
         self.map.place_unit(unit, Point(1, 1))

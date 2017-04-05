@@ -64,6 +64,30 @@ class TestSoldier(TestBaseUnit):
         self.unit.receive_dmg(self.unit.get_health() - 1)
         self.assertFalse(self.unit.is_dead())
 
+    def test_heal_lt_max_health(self):
+        self.unit.receive_dmg(2)
+        self.unit.heal(0)
+        self.unit.heal(1)
+        self.assertEqual(self.unit.get_health(), 99)
+
+    def test_heal_eq_max_health(self):
+        self.unit.receive_dmg(2)
+        self.unit.heal(2)
+        self.assertEqual(self.unit.get_health(), 100)
+
+    def test_heal_gt_max_health(self):
+        self.unit.receive_dmg(2)
+        self.unit.heal(3)
+        self.assertEqual(self.unit.get_health(), 100)
+
+    def test_heal_dead_person(self):
+        self.unit.receive_dmg(120)
+        self.unit.heal(100)
+        self.assertEqual(self.unit.get_health(), -20)
+
+    def test_heal_neg_health(self):
+        self.assertRaises(ValueError, self.unit.heal, -1)
+
 
 
 

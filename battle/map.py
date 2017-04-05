@@ -10,7 +10,7 @@ class MapPlacementError(ValueError):
 
 
 class Map(object):
-    def __init__(self, width, height, tiles, units=None):
+    def __init__(self, width: int, height: int, tiles: list, units=None):
         self._all_points = Point(0, 0).to_rectangle(width, height)
         self._tiles = dict.fromkeys(self._all_points, None)
         self._units = dict.fromkeys(self._all_points, None)
@@ -65,6 +65,7 @@ class Map(object):
         self._raise_unit_placement_error(point)
         self._units[point] = unit
         unit.set_point(point)
+        unit.set_map(self)
 
     def _raise_unit_placement_error(self, point):
         if not self.can_place_unit(point):

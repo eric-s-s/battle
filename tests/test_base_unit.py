@@ -2,7 +2,7 @@ import unittest
 
 from battle.base_unit import BaseUnit
 from battle.maptools.point import Point
-
+from battle.map import Map
 
 class TestBaseUnit(unittest.TestCase):
 
@@ -47,3 +47,26 @@ class TestBaseUnit(unittest.TestCase):
 
         self.unit.del_point()
         self.assertFalse(self.unit.has_point())
+
+    def test_set_map(self):
+        self.assertFalse(self.unit.has_map())
+        map_ = Map(1, 1, [])
+        self.unit.set_map(map_)
+        self.assertTrue(self.unit.is_on_map(map_))
+
+    def test_is_on_map_true(self):
+        map_ = Map(1, 1, [])
+        self.unit.set_map(map_)
+        self.assertTrue(self.unit.is_on_map(map_))
+
+    def test_is_on_map_false(self):
+        map_ = Map(1, 1, [])
+        self.assertFalse(self.unit.is_on_map(map_))
+        self.unit.set_map(Map(1, 1, []))
+        self.assertFalse(self.unit.is_on_map(map_))
+
+    def test_has_map(self):
+        self.assertFalse(self.unit.has_map())
+        self.unit.set_map(Map(1, 1, []))
+        self.assertTrue(self.unit.has_map())
+
