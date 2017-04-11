@@ -1,21 +1,26 @@
-from battle.base_unit import BaseUnit
+from battle.unit_movement import UnitMovement
 from battle.weapon import Weapon
+from battle.map import Map
+from battle.maptools.point import Point
+from battle.maptools.direction import Direction
 
 FIST = Weapon(1, 1)
 
 
-class Soldier(BaseUnit):
-    def __init__(self):
+class Soldier(object):
+    def __init__(self, map_: Map = None, max_move: int = 3):
         self._max_health = 100
-        self._max_move = 3
         self._current_health = self._max_health
-        self._current_move = self._max_move
         self._weapon = FIST
-        super(Soldier, self).__init__()
+        self._movement = UnitMovement(map_=map_, max_move=max_move)
 
-    @property
-    def movement_pts(self) -> int:
-        return self._current_move
+    def place(self, point: Point, map_: Map = None):
+        if map_:
+            self._movement.set_map(map_)
+        self._movement.set_point(point)
+
+    def move(self, direction: Direction):
+        self._movement.move(direction)
 
     def get_health(self) -> int:
         return self._current_health
@@ -51,12 +56,9 @@ class Soldier(BaseUnit):
         raise NotImplementedError
 
 
-
-
-
 class Example(Soldier):
-    def __init__(self, weapon: Weapon):
-        super(Example, self).__init__()
+    def __init__(self, weapon: Weapon, **kwargs):
+        super(Example, self).__init__(**kwargs)
         self.equip_weapon(weapon)
 
 

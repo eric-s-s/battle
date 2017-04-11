@@ -42,12 +42,6 @@ class Map(object):
     def connect(self, pointed_tile):
         point = pointed_tile.get_point()
         self._tiles[point] = pointed_tile
-        for direction in Direction:
-            connect_point = point.in_direction(direction)
-            if self.has_tile(connect_point):
-                old_tile = self.get_tile(connect_point)
-                pointed_tile.set(old_tile, direction)
-                old_tile.set(pointed_tile, direction.opposite())
 
     def is_on_map(self, point):
         return point in self._all_points
@@ -64,8 +58,6 @@ class Map(object):
     def place_unit(self, unit, point):
         self._raise_unit_placement_error(point)
         self._units[point] = unit
-        unit.set_point(point)
-        unit.set_map(self)
 
     def _raise_unit_placement_error(self, point):
         if not self.can_place_unit(point):
@@ -74,27 +66,12 @@ class Map(object):
     def get_unit(self, point):
         return self._units[point]
 
-    def remove_unit(self, unit):
-        if unit.has_point():
-            point = unit.get_point()
-            self._units[point] = None
-            unit.del_point()
-        return unit
+    def remove_unit(self, point: Point):
+        self._units[point] = None
 
-    def move_unit(self, unit, direction):
-        movement_pts = 0
-
-        if not unit.has_point():
-            raise MapPlacementError('tried to move unit not on map')
-
-        point = unit.get_point()
-        new_point = point.in_direction(direction)
-        if self.can_place_unit(new_point):
-            movement_pts = 1
-            self.remove_unit(unit)
-            self.place_unit(unit, new_point)
-
-        return movement_pts
+    def remove_all_units(self):
+        for key in self._units:
+            self._units[key] = None
 
 
 def separate_tiles(tiles):
