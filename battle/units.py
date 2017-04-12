@@ -1,26 +1,32 @@
-from battle.unit_movement import UnitMovement
 from battle.weapon import Weapon
-from battle.map import Map
-from battle.maptools.point import Point
-from battle.maptools.direction import Direction
+
 
 FIST = Weapon(1, 1)
 
 
 class Soldier(object):
-    def __init__(self, map_: Map = None, max_move: int = 3):
+    def __init__(self, max_move: int = 3):
         self._max_health = 100
         self._current_health = self._max_health
+        self._max_move = max_move
+        self._current_move = self._max_move
+
         self._weapon = FIST
-        self._movement = UnitMovement(map_=map_, max_move=max_move)
 
-    def place(self, point: Point, map_: Map = None):
-        if map_:
-            self._movement.set_map(map_)
-        self._movement.set_point(point)
+    def get_move_points(self) -> int:
+        return self._current_move
 
-    def move(self, direction: Direction):
-        self._movement.move(direction)
+    def can_move(self, mv_pts) -> bool:
+        return mv_pts <= self._current_move and not self.is_dead()
+
+    def move(self, mv_pts):
+        if mv_pts < 0:
+            raise ValueError('mv_pts can\'t be less than zero')
+        if self.can_move(mv_pts):
+            self._current_move -= mv_pts
+
+    def reset_move_points(self):
+        self._current_move = self._max_move
 
     def get_health(self) -> int:
         return self._current_health

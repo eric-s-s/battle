@@ -12,8 +12,6 @@ class TestSoldier(unittest.TestCase):
         self.assertIs(self.soldier.get_weapon(), FIST)
         self.assertEqual(self.soldier.get_health(), 100)
 
-    # TODO tests for place and move
-
     def test_equip_weapon(self):
         stick = Weapon(3, 2)
         self.soldier.equip_weapon(stick)
@@ -89,6 +87,20 @@ class TestSoldier(unittest.TestCase):
 
     def test_heal_neg_health(self):
         self.assertRaises(ValueError, self.soldier.heal, -1)
+
+    def test_can_move(self):
+        self.assertTrue(self.soldier.can_move(3))
+        self.assertTrue(self.soldier.can_move(0))
+        self.assertFalse(self.soldier.can_move(4))
+
+    def test_can_move_dead(self):
+        self.soldier.receive_dmg(1000)
+        self.assertFalse(self.soldier.can_move(0))
+
+    def test_move(self):
+        self.soldier.move(2)
+        self.assertEqual(self.soldier.get_move_points(), 1)
+        self.soldier.reset_move_points()
 
 
 
