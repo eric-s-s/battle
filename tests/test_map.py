@@ -92,28 +92,28 @@ class TestMap(unittest.TestCase):
         self.assertFalse(Map(2, 2, []).can_place_unit(Point(1, 1)))
 
     def test_can_place_unit_false_by_occupied_by_unit(self):
-        self.map.place_unit(MovementTracker(), Point(1, 1))
+        self.map.place_unit(MovementTracker(self.map), Point(1, 1))
         self.assertFalse(self.map.can_place_unit(Point(1, 1)))
 
     def test_place_unit_error_by_not_on_map(self):
-        self.assertRaises(MapPlacementError, self.map.place_unit, MovementTracker(), Point(10, 1))
+        self.assertRaises(MapPlacementError, self.map.place_unit, MovementTracker(self.map), Point(10, 1))
 
     def test_place_unit_error_by_no_tile(self):
         test_map = Map(2, 2, [])
-        self.assertRaises(MapPlacementError, test_map.place_unit, MovementTracker(), Point(1, 1))
+        self.assertRaises(MapPlacementError, test_map.place_unit, MovementTracker(test_map), Point(1, 1))
 
     def test_place_unit_error_by_occupied_by_unit(self):
-        self.map.place_unit(MovementTracker(), Point(1, 1))
-        self.assertRaises(MapPlacementError, self.map.place_unit, MovementTracker(), Point(1, 1))
+        self.map.place_unit(MovementTracker(self.map), Point(1, 1))
+        self.assertRaises(MapPlacementError, self.map.place_unit, MovementTracker(self.map), Point(1, 1))
 
     def test_place_unit(self):
-        unit = MovementTracker()
+        unit = MovementTracker(self.map)
         self.map.place_unit(unit, Point(1, 1))
 
         self.assertIs(self.map.get_unit(Point(1, 1)), unit)
 
     def test_remove_unit(self):
-        unit = MovementTracker()
+        unit = MovementTracker(self.map)
         self.map.place_unit(unit, Point(1, 1))
         self.map.remove_unit(Point(1, 1))
         self.assertTrue(self.map.can_place_unit(Point(1, 1)))

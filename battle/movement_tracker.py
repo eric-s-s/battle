@@ -13,7 +13,7 @@ class MovementTracker(object):
         self._units = {}  # type: Dict[Soldier, Point]
 
     def get_point(self, unit: Soldier) -> Point:
-        return self._units.get(unit, default=None)
+        return self._units.get(unit)
 
     def set_point(self, unit: Soldier, point: Point):
         self.del_point(unit)
