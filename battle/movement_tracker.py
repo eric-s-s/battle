@@ -24,10 +24,12 @@ class MovementTracker(object):
         point = self.get_point(unit)
         if point:
             self._map.remove_unit(point)
-            self._units[Soldier] = None
+            self._units[unit] = None
 
     def move(self, unit: Soldier, direction: Direction) -> bool:
         """cannot move if not can_move"""
+        if self.get_point(unit) is None:
+            raise ValueError('unit is not on the map')
         if not self.is_move_allowed(unit, direction):
             return False
         new_point = self.get_point(unit).in_direction(direction)

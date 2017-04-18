@@ -25,6 +25,11 @@ class TestMovementTracker(unittest.TestCase):
     def test_get_point_is_none(self):
         self.assertIsNone(self.mover.get_point(self.soldier))
 
+        point = Point(0, 0)
+        self.mover.set_point(self.soldier, point)
+        self.mover.del_point(self.soldier)
+        self.assertIsNone(self.mover.get_point(self.soldier))
+
     def test_get_point_is_point(self):
         point = Point(0, 0)
         self.mover.set_point(self.soldier, point)
@@ -37,7 +42,13 @@ class TestMovementTracker(unittest.TestCase):
         self.mover.set_point(self.soldier, pt1)
         self.assertEqual(self.mover.get_point(self.soldier), pt1)
 
-    def test_set_point_new_point_removes_unit_from_old_pt(self):
+    def test_set_point_sets_unit_on_map(self):
+        point = Point(0, 0)
+
+        self.mover.set_point(self.soldier, point)
+        self.assertEqual(self.test_map.get_unit(point), self.soldier)
+
+    def test_set_point_removes_unit_from_old_pt_and_place_unit_on_new_point(self):
         pt1 = Point(0, 0)
         pt2 = Point(0, 1)
 
@@ -45,6 +56,7 @@ class TestMovementTracker(unittest.TestCase):
         self.mover.set_point(self.soldier, pt2)
         self.assertIsNone(self.test_map.get_unit(pt1))
         self.assertEqual(self.test_map.get_unit(pt2), self.soldier)
+        self.assertEqual(self.mover.get_point(self.soldier), pt2)
 
     def test_del_point_removes_from_unit_and_map(self):
         point = Point(1, 1)
@@ -53,7 +65,7 @@ class TestMovementTracker(unittest.TestCase):
         self.assertTrue(self.test_map.get_unit(point))
 
         self.mover.del_point(self.soldier)
-        self.assertFalse(self.test_map.get_unit(point))
+        self.assertIsNone(self.test_map.get_unit(point))
         self.assertIsNone(self.test_map.get_unit(point))
 
     def test_move_true(self):
@@ -71,6 +83,10 @@ class TestMovementTracker(unittest.TestCase):
         self.assertEqual(self.test_map.get_unit(Point(0, 0)), self.soldier)
         self.assertEqual(self.soldier.get_move_points(), 3)
 
+    def test_move_unit_not_on_map(self):
+        unit = Soldier()
+        self.assertRaises(ValueError, self.mover.move, unit, Direction.N)
+
     def test_is_move_allowed_true(self):
         self.mover.set_point(self.soldier, Point(0, 0))
         self.assertTrue(self.mover.is_move_allowed(self.soldier, Direction.N))
@@ -79,6 +95,8 @@ class TestMovementTracker(unittest.TestCase):
         self.assertFalse(self.mover.is_move_allowed(self.soldier, Direction.N))
 
     def test_is_move_allowed_false_map_cannot_place_unit(self):
+        '''self.mover sets two units at two points. one unit can't move into the other unit's point.
+                  self.mover sets a unit at an edge. the unit can't move over the edge of the map.'''
         self.mover.set_point(self.soldier, Point(0, 0))
         new = MovementTracker(self.test_map)
         unit = Soldier()
@@ -89,8 +107,15 @@ class TestMovementTracker(unittest.TestCase):
         self.assertFalse(new.is_move_allowed(self.soldier, Direction.N))
         self.assertFalse(new.is_move_allowed(self.soldier, Direction.S))
 
+        self.assertFalse(new.is_move_allowed(unit, Direction.N))
+        self.assertFalse(new.is_move_allowed(unit, Direction.S))
+
+
+
     def test_has_enough_move(self):
         self.assertTrue(self.mover.has_enough_move(self.soldier, 1))
         self.assertTrue(self.mover.has_enough_move(self.soldier, 3))
         self.assertFalse(self.mover.has_enough_move(self.soldier, 5))
 
+    def test_get_move_pts(self):
+        pass
