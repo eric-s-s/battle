@@ -61,7 +61,6 @@ class Soldier(object):
         """heal and reset_move"""
         raise NotImplementedError
 
-
 class Example(Soldier):
     def __init__(self, weapon: Weapon, **kwargs):
         super(Example, self).__init__(**kwargs)

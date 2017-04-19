@@ -102,7 +102,7 @@ class TestMap(unittest.TestCase):
 
     def test_place_unit_error_by_no_tile(self):
         test_map = Map(2, 2, [])
-        self.assertRaises(MapPlacementError, test_map.place_unit, MovementTracker(test_map), Point(1, 1))
+        self.assertRaises(MapPlacementError, test_map.place_unit, self.unit, Point(1, 1))
 
     def test_place_unit_error_by_occupied_by_unit(self):
         unit_2 = Soldier()
