@@ -11,6 +11,14 @@ class TestSoldier(unittest.TestCase):
     def test_init_default_settings(self):
         self.assertIs(self.soldier.get_weapon(), FIST)
         self.assertEqual(self.soldier.get_health(), 100)
+        self.assertEqual(self.soldier.get_move_points(), 3)
+        self.assertEqual(self.soldier._healing_pct, 5.0)
+
+    def test_init_set_parameters(self):
+        unit = Soldier(5, 200, 10.0)
+        self.assertEqual(unit.get_health(), 200)
+        self.assertEqual(unit.get_move_points(), 5)
+        self.assertEqual(unit._healing_pct, 10.0)
 
     def test_equip_weapon(self):
         stick = Weapon(3, 2)
@@ -102,6 +110,24 @@ class TestSoldier(unittest.TestCase):
         self.assertEqual(self.soldier.get_move_points(), 1)
         self.soldier.reset_move_points()
 
+    def test_reset_move(self):
+        self.soldier.move(2)
+        self.soldier.reset_move_points()
+        self.assertEqual(self.soldier.get_move_points(), 3)
+
+    def test_rest_alive(self):
+        self.soldier.move(2)
+        self.soldier.receive_dmg(6)
+        self.soldier.rest()
+        self.assertEqual(self.soldier.get_move_points(), 3)
+        self.assertEqual(self.soldier.get_health(), 99)
+
+    def test_rest_dead(self):
+        self.soldier.move(2)
+        self.soldier.receive_dmg(1000)
+        self.soldier.rest()
+        self.assertEqual(self.soldier.get_move_points(), 3)
+        self.assertEqual(self.soldier.get_health(), -900)
 
 
 

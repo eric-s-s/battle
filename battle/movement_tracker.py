@@ -1,8 +1,8 @@
 from typing import Dict
 
-from battle.maptools.point import Point
-from battle.map import Map
 from battle.maptools.direction import Direction
+from battle.maptools.map import Map
+from battle.maptools.point import Point
 from battle.units import Soldier
 
 

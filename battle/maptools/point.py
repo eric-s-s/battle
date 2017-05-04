@@ -1,22 +1,25 @@
 from battle.maptools.direction import Direction
+from typing import Optional
+
+pt = Optional['Point']
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 
 
 class Point(object):
-    def __init__(self, x, y):
+    def __init__(self, x: int, y: int) -> None:
         self._x = x
         self._y = y
 
     @property
-    def x(self):
+    def x(self) -> int:
         return self._x
 
     @property
-    def y(self):
+    def y(self) -> int:
         return self._y
 
-    def __eq__(self, other):
+    def __eq__(self, other: pt):
         if not isinstance(other, Point):
             return False
         return (self.x, self.y) == (other.x, other.y)
@@ -45,14 +48,14 @@ class Point(object):
     def __hash__(self):
         return hash(repr(self))
 
-    def in_direction(self, direction):
+    def in_direction(self, direction: Direction) -> pt:
         del_x, del_y = direction.value
         return self.plus(del_x, del_y)
 
-    def plus(self, x, y):
+    def plus(self, x: int, y: int) -> pt:
         return Point(self._x + x, self._y + y)
 
-    def at_distance(self, distance):
+    def at_distance(self, distance: int) -> list:
         if distance == 0:
             return [self]
         out = []
@@ -63,7 +66,7 @@ class Point(object):
                 out.append(self.plus(del_x, - del_y))
         return sorted(out)
 
-    def to_rectangle(self, x_size, y_size):
+    def to_rectangle(self, x_size: int, y_size: int) -> list:
         out = []
         x_range = get_range(x_size)
         y_range = get_range(y_size)

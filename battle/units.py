@@ -5,11 +5,12 @@ FIST = Weapon(1, 1)
 
 
 class Soldier(object):
-    def __init__(self, max_move: int = 3):
-        self._max_health = 100
+    def __init__(self, max_move: int = 3, max_health: int = 100, heal_pct: float = 5.0):
+        self._max_health = max_health
         self._current_health = self._max_health
         self._max_move = max_move
         self._current_move = self._max_move
+        self._healing_pct = heal_pct
 
         self._weapon = FIST
 
@@ -59,7 +60,10 @@ class Soldier(object):
 
     def rest(self):
         """heal and reset_move"""
-        raise NotImplementedError
+        heal_points = int(round(self._max_health * self._healing_pct / 100.))
+        self.heal(heal_points)
+        self.reset_move_points()
+
 
 class Example(Soldier):
     def __init__(self, weapon: Weapon, **kwargs):

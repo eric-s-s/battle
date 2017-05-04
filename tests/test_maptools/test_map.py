@@ -1,9 +1,9 @@
 import unittest
 
-from battle.movement_tracker import MovementTracker
-from battle.map import Map, MapPlacementError
+from battle.maptools.map import Map, MapPlacementError
 from battle.maptools.point import Point
-from battle.tile import Tile
+from battle.maptools.tile import Tile
+from battle.movement_tracker import MovementTracker
 from battle.units import Soldier
 
 

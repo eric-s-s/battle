@@ -1,10 +1,10 @@
 import unittest
 
-from battle.movement_tracker import MovementTracker
-from battle.maptools.point import Point
-from battle.map import Map
-from battle.tile import Tile
 from battle.maptools.direction import Direction
+from battle.maptools.map import Map
+from battle.maptools.point import Point
+from battle.maptools.tile import Tile
+from battle.movement_tracker import MovementTracker
 from battle.units import Soldier
 
 

@@ -10,7 +10,7 @@ class MapPlacementError(ValueError):
 
 
 class Map(object):
-    def __init__(self, width: int, height: int, tiles: list, units=None):
+    def __init__(self, width: int, height: int, tiles: list):
         self._all_points = Point(0, 0).to_rectangle(width, height)
         self._tiles = dict.fromkeys(self._all_points, None)
         self._units = dict.fromkeys(self._all_points, None)
@@ -65,6 +65,9 @@ class Map(object):
 
     def get_unit(self, point):
         return self._units[point]
+
+    def has_unit(self, point: Point) -> bool:
+        return self._units[point] is not None
 
     def remove_unit(self, point: Point):
         self._units[point] = None

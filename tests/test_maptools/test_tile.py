@@ -2,7 +2,7 @@ import unittest
 
 from battle.maptools.direction import Direction
 from battle.maptools.point import Point
-from battle.tile import Tile, TileOccupationError
+from battle.maptools.tile import Tile, TileOccupationError
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 
