@@ -6,7 +6,7 @@ from battle.maptools.tile import Tile
 from battle.movement_tracker import MovementTracker
 from battle.units import Soldier
 
-
+# TODO fix the damn tests
 class TestMap(unittest.TestCase):
     def setUp(self):
         self.unit = Soldier()

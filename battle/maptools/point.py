@@ -1,7 +1,6 @@
 from battle.maptools.direction import Direction
-from typing import Optional
+from typing import List, Any
 
-pt = Optional['Point']
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 
@@ -19,15 +18,15 @@ class Point(object):
     def y(self) -> int:
         return self._y
 
-    def __eq__(self, other: pt):
+    def __eq__(self, other: Any):
         if not isinstance(other, Point):
             return False
         return (self.x, self.y) == (other.x, other.y)
 
-    def __ne__(self, other):
+    def __ne__(self, other: Any):
         return not self == other
 
-    def __lt__(self, other):
+    def __lt__(self, other: 'Point'):
         return (self.y, self.x) < (other.y, other.x)
 
     def __le__(self, other):
@@ -48,14 +47,14 @@ class Point(object):
     def __hash__(self):
         return hash(repr(self))
 
-    def in_direction(self, direction: Direction) -> pt:
+    def in_direction(self, direction: Direction) -> 'Point':
         del_x, del_y = direction.value
         return self.plus(del_x, del_y)
 
-    def plus(self, x: int, y: int) -> pt:
+    def plus(self, x: int, y: int) -> 'Point':
         return Point(self._x + x, self._y + y)
 
-    def at_distance(self, distance: int) -> list:
+    def at_distance(self, distance: int) -> List['Point']:
         if distance == 0:
             return [self]
         out = []
@@ -66,7 +65,7 @@ class Point(object):
                 out.append(self.plus(del_x, - del_y))
         return sorted(out)
 
-    def to_rectangle(self, x_size: int, y_size: int) -> list:
+    def to_rectangle(self, x_size: int, y_size: int) -> List['Point']:
         out = []
         x_range = get_range(x_size)
         y_range = get_range(y_size)
@@ -80,4 +79,3 @@ def get_range(stop_by):
     if stop_by < 0:
         return range(0, stop_by, -1)
     return range(stop_by)
-

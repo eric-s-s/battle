@@ -1,11 +1,3 @@
-from battle.maptools.direction import Direction as Dir
-
-
-class TileOccupationError(ValueError):
-    def __init__(self, msg='', *args, **kwargs):
-        super(TileOccupationError, self).__init__(msg, *args, **kwargs)
-
-
 class Tile(object):
     @classmethod
     def blank(cls):

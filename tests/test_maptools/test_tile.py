@@ -2,7 +2,7 @@ import unittest
 
 from battle.maptools.direction import Direction
 from battle.maptools.point import Point
-from battle.maptools.tile import Tile, TileOccupationError
+from battle.maptools.tile import Tile
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 
@@ -13,27 +13,6 @@ class MockTerrain(object):
 
     def copy(self):
         return MockTerrain(self.name)
-
-
-class TestTileOccupationError(unittest.TestCase):
-    @staticmethod
-    def raise_error(msg=''):
-        if msg:
-            raise TileOccupationError(msg)
-        else:
-            raise TileOccupationError
-
-    def test_no_message(self):
-        self.assertRaises(TileOccupationError, self.raise_error)
-
-    def test_with_msg(self):
-        self.assertRaises(TileOccupationError, self.raise_error, 'oops')
-
-    def test_msg_content(self):
-        with self.assertRaises(TileOccupationError) as cm:
-            self.raise_error('hello')
-        msg = cm.exception.args[0]
-        self.assertEqual(msg, 'hello')
 
 
 class TestTile(unittest.TestCase):
