@@ -65,7 +65,7 @@ class Map(object):
         return self._units[point]
 
     def has_unit(self, point: Point) -> bool:
-        return self._units[point] is not None
+        return self._units.get(point) is not None
 
     def remove_unit(self, point: Point):
         self._units[point] = None

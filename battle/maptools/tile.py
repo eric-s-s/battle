@@ -1,11 +1,24 @@
+"""
+this module is temporary.  It is testing out some basic ideas for Tile and enabling move_pts
+
+"""
+
+
 class Tile(object):
     @classmethod
     def blank(cls):
-        return cls('blank')
+        return cls()
 
-    def __init__(self, terrain, point=None):
-        self._terrain = terrain
+    def __init__(self, elevation=0, terrain_multiplier=1, point=None):
+        self._elevation = elevation
+        self._terrain_multiplier = terrain_multiplier
         self._point = point
+
+    def get_elevation(self):
+        return self._elevation
+
+    def get_terrain_type(self):
+        return self._terrain_multiplier
 
     def get_point(self):
         return self._point
@@ -20,11 +33,9 @@ class Tile(object):
     def has_point(self):
         return self._point is not None
 
-    def get_terrain(self):
-        return self._terrain
-
     def move_pts(self, other_tile):
-        return 1
+        basic_move = max(1, other_tile.get_elevation() - self._elevation + 1)
+        return self._terrain_multiplier * basic_move
 
 
 
