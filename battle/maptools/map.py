@@ -25,7 +25,8 @@ class Map(object):
     def _lay_pointed_tiles(self, tiles):
         for tile in tiles:
             self._raise_placement_error(tile)
-            self.connect(tile)
+            point = tile.get_point()
+            self._tiles[point] = tile
 
     def _raise_placement_error(self, tile):
         point = tile.get_point()
@@ -36,12 +37,9 @@ class Map(object):
         available_points = [key for key in self._all_points if not self._tiles[key]]
         _raise_too_many_tiles_error(tiles, available_points)
         for tile in tiles:
-            tile.set_point(available_points.pop(0))
-            self.connect(tile)
-
-    def connect(self, pointed_tile):
-        point = pointed_tile.get_point()
-        self._tiles[point] = pointed_tile
+            point = available_points.pop(0)
+            tile.set_point(point)
+            self._tiles[point] = tile
 
     def is_on_map(self, point):
         return point in self._all_points
@@ -67,7 +65,7 @@ class Map(object):
         return self._units[point]
 
     def has_unit(self, point: Point) -> bool:
-        return self._units[point] is not None
+        return self._units.get(point) is not None
 
     def remove_unit(self, point: Point):
         self._units[point] = None

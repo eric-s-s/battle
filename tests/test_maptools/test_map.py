@@ -44,14 +44,14 @@ class TestMap(unittest.TestCase):
         self.assertRaises(MapPlacementError, Map, 2, 2, tiles)
 
     def test_init_raises_error_two_tiles_same_point(self):
-        tiles = [Tile('a', Point(0, 0)), Tile('b', Point(0, 0))]
+        tiles = [Tile(point=Point(0, 0)), Tile(point=Point(0, 0))]
         self.assertRaises(MapPlacementError, Map, 2, 2, tiles)
 
     def test_init_raises_error_if_more_tiles_than_points(self):
         tiles = get_tiles_without_points(5, 5)
         self.assertRaises(MapPlacementError, Map, 2, 2, tiles)
 
-    def test_init_does_if_tiles_do_not_fill_points(self):
+    def test_init_if_tiles_do_not_fill_points(self):
         tiles = get_tiles_without_points(3, 2)
         test_map = Map(3, 3, tiles)
         for point in Point(0, 0).to_rectangle(3, 2):
@@ -111,8 +111,29 @@ class TestMap(unittest.TestCase):
 
     def test_place_unit(self):
         self.map.place_unit(self.unit, Point(1, 1))
-
         self.assertIs(self.map.get_unit(Point(1, 1)), self.unit)
+
+    def test_has_unit_point_not_on_map_false(self):
+        self.assertFalse(self.map.has_unit(Point(-1, -1)))
+
+    def test_has_unit_false(self):
+        self.assertFalse(self.map.has_unit(Point(1, 1)))
+
+    def test_has_unit_true(self):
+        self.map.place_unit(Soldier(), Point(1, 1))
+        self.assertTrue(self.map.has_unit(Point(1, 1)))
+        self.assertFalse(self.map.has_unit(Point(2, 1)))
+
+    def test_get_unit_is_none_when_no_unit(self):
+        self.assertIsNone(self.map.get_unit(Point(1, 1)))
+
+    def test_get_unit(self):
+        unit = Soldier()
+        point = Point(1, 1)
+        self.map.place_unit(unit, point)
+        self.assertIs(unit, self.map.get_unit(point))
+
+        self.assertIsNone(self.map.get_unit(Point(0, 0)))
 
     def test_remove_unit(self):
         self.map.place_unit(self.unit, Point(1, 1))
@@ -125,12 +146,12 @@ class TestMap(unittest.TestCase):
 
 def get_tiles_without_points(width, height):
     pt_list = get_pt_list(width, height)
-    return [Tile(str(pt)) for pt in pt_list]
+    return [Tile.blank() for _ in pt_list]
 
 
 def get_tiles_with_points(width, height):
     pt_list = get_pt_list(width, height)
-    return [Tile(str(pt), pt) for pt in pt_list]
+    return [Tile(point=pt) for pt in pt_list]
 
 
 def get_pt_list(width, height):
