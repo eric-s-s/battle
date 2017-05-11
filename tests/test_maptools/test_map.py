@@ -3,7 +3,6 @@ import unittest
 from battle.maptools.map import Map, MapPlacementError
 from battle.maptools.point import Point
 from battle.maptools.tile import Tile
-from battle.movement_tracker import MovementTracker
 from battle.units import Soldier
 
 
@@ -30,7 +29,7 @@ class TestMap(unittest.TestCase):
     def test_init_mixed_tiles(self):
         width = 2
         height = 2
-        tiles = [Tile('(0, 0)', Point(0, 0)), Tile('(0, 1)'), Tile('(1, 0)'), Tile('(1, 1)', Point(1, 1))]
+        tiles = [Tile(point=Point(0, 0)), Tile(), Tile(), Tile(point=Point(1, 1))]
         self.assertFalse(tiles[1].has_point())
 
         test_map = Map(width, height, tiles)
@@ -141,12 +140,18 @@ class TestMap(unittest.TestCase):
         self.assertTrue(self.map.can_place_unit(Point(1, 1)))
 
     def test_remove_all_units(self):
-        unit1 = MovementTracker(self.map)
+        points = Point(0, 0).to_rectangle(2, 2)
+        for point in points:
+            self.map.place_unit(Soldier(), point)
+        self.map.remove_all_units()
+
+        for point in points:
+            self.assertFalse(self.map.has_unit(point))
 
 
 def get_tiles_without_points(width, height):
     pt_list = get_pt_list(width, height)
-    return [Tile.blank() for _ in pt_list]
+    return [Tile() for _ in pt_list]
 
 
 def get_tiles_with_points(width, height):
@@ -156,5 +161,3 @@ def get_tiles_with_points(width, height):
 
 def get_pt_list(width, height):
     return Point(0, 0).to_rectangle(width, height)
-
-

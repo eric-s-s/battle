@@ -1,41 +1,43 @@
-"""
-this module is temporary.  It is testing out some basic ideas for Tile and enabling move_pts
-
-"""
+from typing import Union
+from battle.maptools.point import Point
 
 
 class Tile(object):
-    @classmethod
-    def blank(cls):
-        return cls()
-
-    def __init__(self, elevation=0, terrain_multiplier=1, point=None):
+    def __init__(self, elevation: Union[int, float] = 0, terrain_mv: int = 1, point: Point = None):
+        if elevation != float('inf'):
+            elevation = int(elevation)
         self._elevation = elevation
-        self._terrain_multiplier = terrain_multiplier
+
+        self._terrain_mv = max(terrain_mv, 1)
         self._point = point
 
-    def get_elevation(self):
+    def get_elevation(self) -> Union[int, float]:
         return self._elevation
 
-    def get_terrain_type(self):
-        return self._terrain_multiplier
+    def get_terrain_mv(self) -> Union[int, float]:
+        return self._terrain_mv
 
-    def get_point(self):
+    def get_point(self) -> Point:
         return self._point
 
-    def del_point(self):
+    def del_point(self) -> None:
         self._point = None
 
-    def set_point(self, new_point):
+    def set_point(self, new_point) -> None:
         self.del_point()
         self._point = new_point
 
-    def has_point(self):
+    def has_point(self) -> bool:
         return self._point is not None
 
-    def move_pts(self, other_tile):
-        basic_move = max(1, other_tile.get_elevation() - self._elevation + 1)
-        return self._terrain_multiplier * basic_move
+    def move_pts(self, other_tile) -> Union[int, float]:
+        if other_tile is self:
+            return 0
+        basic_move = max(0, other_tile.get_elevation() - self._elevation)
+        return self._terrain_mv + basic_move
 
 
-
+class ImpassableTile(Tile):
+    def __init__(self, terrain_mv=1, point=None):
+        elevation = float('inf')
+        super(ImpassableTile, self).__init__(elevation, terrain_mv, point)
