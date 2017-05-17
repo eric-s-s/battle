@@ -111,23 +111,3 @@ class TestTile(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-
-"""
-hey oscar.  here is another set to test
-
-
-
-    def test_for_oscar(self):
-        points = Point(0, 0).to_rectangle(3, 3)
-        p_to_t = {point: Tile(elevation=(point.x * point.y % 2), point=point) for point in points}
-        elevations = {Point(0, 0): 0, Point(1, 0): 0, Point(2, 0): 0,
-                      Point(0, 1): 0, Point(1, 1): 1, Point(2, 1): 2,
-                      Point(0, 2): 0, Point(1, 2): 0, Point(2, 2): 0}
-        origin = Point(1, 1)
-        mv_pts = {Point(0, 0): 2, Point(1, 0): 1, Point(2, 0): 2,
-                  Point(0, 1): 1, Point(1, 1): 0, Point(2, 1): 2,
-                  Point(0, 2): 2, Point(1, 2): 1, Point(2, 2): 2}  # this point has two different ways from 1,1
-                                                                   # one way costs 2 and one way costs 3
-
-"""

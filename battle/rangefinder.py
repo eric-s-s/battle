@@ -40,12 +40,21 @@ class RangeFinder(object):
                 output =
 
                 ."""
-        point_to_mvpts = {origin: 1}
+        point_to_mvpts = {origin: 0}
 
-        for point in self.get_all_points(origin, range_):
-            point_tile = self._map.get_tile(point)
-            mvpts = self._map.get_tile(origin).move_pts(point_tile)
-            point_to_mvpts[point] = mvpts
+        distances = self.get_all_points(origin, range_)
+
+        for distance in range(1, range_ + 1):
+            points = distances[distance]
+            for point in points:
+                neighbors = point.at_distance(1)
+                point_value = float('inf')
+                for neighbor_pt in neighbors:
+                    if neighbor_pt in point_to_mvpts:
+                        origin_to_neighbor = point_to_mvpts[neighbor_pt]
+                        neighbor_to_point = self._map.get_tile(neighbor_pt).move_pts(self._map.get_tile(point))
+                        point_value = min(point_value, neighbor_to_point + origin_to_neighbor)
+                    point_to_mvpts[point] = point_value
         return point_to_mvpts
 
 
