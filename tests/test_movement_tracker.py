@@ -9,7 +9,7 @@ from battle.units import Soldier
 
 
 class TestMovementTracker(unittest.TestCase):
-    test_map = Map(2, 2, [Tile.blank(), Tile.blank(), Tile.blank(), Tile.blank()])
+    test_map = Map(2, 2, [Tile(), Tile(), Tile(), Tile()])
 
     def setUp(self):
         self.mover = MovementTracker(map_=self.test_map)
