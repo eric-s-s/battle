@@ -54,7 +54,7 @@ class RangeFinder(object):
                         origin_to_neighbor = point_to_mvpts[neighbor_pt]
                         neighbor_to_point = self._map.get_tile(neighbor_pt).move_pts(self._map.get_tile(point))
                         point_value = min(point_value, neighbor_to_point + origin_to_neighbor)
-                    point_to_mvpts[point] = point_value
+                point_to_mvpts[point] = point_value
         return point_to_mvpts
 
 

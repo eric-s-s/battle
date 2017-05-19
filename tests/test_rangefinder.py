@@ -68,9 +68,6 @@ class TestRangeFinder(unittest.TestCase):
             answer[distance] = soldiers
         self.assertEqual(answer, self.ranger.get_all_units(Point(0, 0), 6))
 
-        # """put soldiers in one by one and then test two lists.  rememeber that the order of points
-        #     will be important. you can sort your points00by distance first first."""
-
     def test_get_distances_flat_tiles(self):
         map_ = Map(3, 3, [Tile() for _ in range(9)])
         answer = RangeFinder(map_).get_distances(Point(0, 0), 1)
@@ -88,23 +85,19 @@ class TestRangeFinder(unittest.TestCase):
                     (Point(0, 2), 2), (Point(1, 2), 3), (Point(2, 2), 4)]
         origin_1 = Point(1, 1)
         expected_1 = {Point(0, 0): 2, Point(1, 0): 1, Point(2, 0): 3,
-                    Point(0, 1): 1, Point(1, 1): 0, Point(2, 1): 2,
-                    Point(0, 2): 3, Point(1, 2): 2, Point(2, 2): 4}
+                      Point(0, 1): 1, Point(1, 1): 0, Point(2, 1): 2,
+                      Point(0, 2): 3, Point(1, 2): 2, Point(2, 2): 4}
         answer = RangeFinder(the_map).get_distances(origin_1, 5)
         self.assertEqual(answer, expected_1)
 
-
         origin_2 = Point(2, 1)
         expected_2 = {Point(0, 0): 3, Point(1, 0): 2, Point(2, 0): 1,
-                    Point(0, 1): 2, Point(1, 1): 1, Point(2, 1): 0,
-                    Point(0, 2): 4, Point(1, 2): 3, Point(2, 2): 2}
+                      Point(0, 1): 2, Point(1, 1): 1, Point(2, 1): 0,
+                      Point(0, 2): 4, Point(1, 2): 3, Point(2, 2): 2}
         answer = RangeFinder(the_map).get_distances(origin_2, 5)
         self.assertEqual(expected_2, answer)
 
     def test_for_oscar(self):
-
-        print(self.ranger.get_all_points(Point(1, 1), 5))
-
 
         elevations = {Point(0, 0): 0, Point(1, 0): 0,
                       Point(0, 1): 1, Point(1, 1): 2}
@@ -113,5 +106,17 @@ class TestRangeFinder(unittest.TestCase):
         map_ = Map(2, 2, tiles)
         origin = Point(0, 1)
         expected = {Point(0, 0): 1, Point(1, 0): 2,  # point(1, 0) has two different ways from 0,1
-                  Point(0, 1): 0, Point(1, 1): 2}  # one way costs 2 and one way costs 3
+                    Point(0, 1): 0, Point(1, 1): 2}  # one way costs 2 and one way costs 3
+        self.assertEqual(RangeFinder(map_).get_distances(origin, 2), expected)
+
+    def test_for_oscar_two(self):
+
+        elevations = {Point(0, 0): 2, Point(1, 0): 0,
+                      Point(0, 1): 1, Point(1, 1): 0}
+
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(2, 2, tiles)
+        origin = Point(0, 1)
+        expected = {Point(0, 0): 2, Point(1, 0): 2,  # point(1, 0) has two different ways from 0,1
+                    Point(0, 1): 0, Point(1, 1): 1}  # one way costs 2 and one way costs 3
         self.assertEqual(RangeFinder(map_).get_distances(origin, 2), expected)
