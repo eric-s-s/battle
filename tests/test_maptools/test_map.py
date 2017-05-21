@@ -58,6 +58,10 @@ class TestMap(unittest.TestCase):
         for point in Point(0, 2).to_rectangle(3, 1):
             self.assertFalse(test_map.has_tile(point))
 
+    def test_get_size(self):
+        to_test = Map(3, 5, [])
+        self.assertEqual(to_test.get_size(), (3, 5))
+
     def test_is_on_map_true(self):
         points = Point(0, 0).to_rectangle(self.width, self.height)
         for point in points:

@@ -45,6 +45,10 @@ class Map(object):
             tile.set_point(point)
             self._tiles[point] = tile
 
+    def get_size(self):
+        last_point = self._all_points[-1]
+        return last_point.x + 1, last_point.y + 1
+
     def is_on_map(self, point: Point) -> bool:
         return point in self._all_points
 

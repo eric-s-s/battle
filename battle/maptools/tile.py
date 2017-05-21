@@ -14,7 +14,7 @@ class Tile(object):
     def get_elevation(self) -> Union[int, float]:
         return self._elevation
 
-    def get_terrain_mv(self) -> Union[int, float]:
+    def get_terrain_mv(self) -> int:
         return self._terrain_mv
 
     def get_point(self) -> Point:
