@@ -48,6 +48,33 @@ class RangeFinder(object):
 
     def get_move_pts_two(self, start, max_mv):
         points_to_mvpts = {start: 0}
-        for point in start.at_distance(1):
-            pass
+        edges = {start}
+        while not edges_gt_max(points_to_mvpts, edges, max_mv):
+            temp_edges = edges.copy()
+            for point in edges:
+                if points_to_mvpts[point] <= max_mv:
+                    temp_edges.discard(point)
+                    candidate_edges = point.at_distance(1)
+                    for new_edge in candidate_edges:
+                        mv = self.get_mv_pts(point, new_edge) + points_to_mvpts[point]
+                        if new_edge not in points_to_mvpts:
+                            points_to_mvpts[new_edge] = mv
+                            temp_edges.add(new_edge)
+                        elif mv < points_to_mvpts[new_edge]:
+                            points_to_mvpts[new_edge] = mv
+
+            edges = temp_edges.copy()
+        print(sorted(edges))
+        return {point: value for point, value in points_to_mvpts.items() if value <= max_mv}
+
+    def get_mv_pts(self, start, finish):
+        if self._map.can_place_unit(finish):
+            return self._map.get_tile(start).move_pts(self._map.get_tile(finish))
+        else:
+            return float('inf')
+
+
+def edges_gt_max(points_dict, edges, max_mv):
+    return all(points_dict[edge] > max_mv for edge in edges)
+
 
