@@ -28,12 +28,12 @@ class RangeFinder(object):
             distances_to_units[distance] = units
         return distances_to_units
 
-    def get_distances(self, origin: Point, range_: int) -> dict:
+    def get_move_points(self, origin: Point, max_mv: int) -> dict:
         point_to_mvpts = {origin: 0}
 
-        distances = self.get_all_points(origin, range_)
+        distances = self.get_all_points(origin, max_mv)
 
-        for distance in range(1, range_ + 1):
+        for distance in range(1, max_mv + 1):
             points = distances[distance]
             for point in points:
                 neighbors = point.at_distance(1)
@@ -45,3 +45,9 @@ class RangeFinder(object):
                         point_value = min(point_value, neighbor_to_point + origin_to_neighbor)
                 point_to_mvpts[point] = point_value
         return point_to_mvpts
+
+    def get_move_pts_two(self, start, max_mv):
+        points_to_mvpts = {start: 0}
+        for point in start.at_distance(1):
+            pass
+
