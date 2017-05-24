@@ -2,9 +2,8 @@ import unittest
 
 from battle.maptools.map import Map
 from battle.maptools.point import Point
-from battle.maptools.direction import Direction
 from battle.units import Soldier
-from battle.maptools.tile import Tile
+from battle.maptools.tile import Tile, ImpassableTile
 from battle.rangefinder import RangeFinder
 
 
@@ -21,12 +20,17 @@ class TestRangeFinder(unittest.TestCase):
     def test_init(self):
         map_ = Map(2, 2, [Tile(), Tile(), Tile(), Tile()])
         range_finder = RangeFinder(map_)
-        self.assertEqual(range_finder._map, map_ )
+        self.assertEqual(range_finder._map, map_)
 
-    def test_get_all_points_distance_gt_one(self):
-        answer = self.ranger.get_all_points(Point(0, 0), 2)
+    def test_get_all_points_distance_zero(self):
+        origin = Point(1, 1)
+        self.assertEqual(self.ranger.get_all_points(origin, 0), {0: [origin]})
+
+    def test_get_all_points_distance(self):
+        origin = Point(0, 0)
+        answer = self.ranger.get_all_points(origin, 2)
         expected = {
-            0: [Point(0, 0)],
+            0: [origin],
             1: [Point(1, 0), Point(0, 1)],
             2: [Point(2, 0), Point(1, 1), Point(0, 2)]
         }
@@ -36,6 +40,13 @@ class TestRangeFinder(unittest.TestCase):
         answer = self.ranger.get_all_points(Point(0, 0), 1)
         self.assertEqual(answer, {0: [Point(0, 0)],
                                   1: [Point(1, 0), Point(0, 1)]})
+
+    def test_get_all_points_shortcut_for_distances_beyond_map(self):
+        expected = dict.fromkeys(range(0, 101), [])
+        expected[0] = [Point(1, 1)]
+        expected[1] = [Point(1, 0), Point(0, 1), Point(2, 1), Point(1, 2)]
+        expected[2] = [Point(0, 0), Point(2, 0), Point(0, 2), Point(2, 2)]
+        self.assertEqual(self.ranger.get_all_points(Point(1, 1), 100), expected)
 
     def test_get_all_points_includes_points_on_map_but_with_no_tile(self):
         new_map = Map(3, 3, [])
@@ -68,9 +79,6 @@ class TestRangeFinder(unittest.TestCase):
             answer[distance] = soldiers
         self.assertEqual(answer, self.ranger.get_all_units(Point(0, 0), 6))
 
-        # """put soldiers in one by one and then test two lists.  rememeber that the order of points
-        #     will be important. you can sort your points00by distance first first."""
-
     def test_get_distances_flat_tiles(self):
         map_ = Map(3, 3, [Tile() for _ in range(9)])
         answer = RangeFinder(map_).get_distances(Point(0, 0), 1)
@@ -79,32 +87,53 @@ class TestRangeFinder(unittest.TestCase):
                     Point(1, 0): 1}
         self.assertEqual(answer, expected)
 
-    def test_get_distance_non_flat_map(self):
-        points = Point(0, 0).to_rectangle(3, 3)
-        tiles = [Tile(elevation=(point.x + point.y), point=point) for point in points]
+    def test_get_distances_only_includes_distances_on_map(self):
+        map_ = Map(2, 2, [Tile() for _ in range(4)])
+        answer = RangeFinder(map_).get_distances(Point(0, 0), 100)
+        expected = {Point(0, 0): 0,
+                    Point(0, 1): 1,
+                    Point(1, 0): 1,
+                    Point(1, 1): 2}
+        self.assertEqual(answer, expected)
+
+    def test_get_distance_non_uniform_elevation(self):
+        points_to_elevation = {Point(0, 0): 0, Point(1, 0): 1, Point(2, 0): 2,
+                               Point(0, 1): 1, Point(1, 1): 2, Point(2, 1): 3,
+                               Point(0, 2): 2, Point(1, 2): 3, Point(2, 2): 4}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
         the_map = Map(3, 3, tiles)
-        point_el = [(Point(0, 0), 0), (Point(1, 0), 1), (Point(2, 0), 2),
-                    (Point(0, 1), 1), (Point(1, 1), 2), (Point(2, 1), 3),
-                    (Point(0, 2), 2), (Point(1, 2), 3), (Point(2, 2), 4)]
+
         origin_1 = Point(1, 1)
         expected_1 = {Point(0, 0): 2, Point(1, 0): 1, Point(2, 0): 3,
-                    Point(0, 1): 1, Point(1, 1): 0, Point(2, 1): 2,
-                    Point(0, 2): 3, Point(1, 2): 2, Point(2, 2): 4}
+                      Point(0, 1): 1, Point(1, 1): 0, Point(2, 1): 2,
+                      Point(0, 2): 3, Point(1, 2): 2, Point(2, 2): 4}
         answer = RangeFinder(the_map).get_distances(origin_1, 5)
         self.assertEqual(answer, expected_1)
 
-
         origin_2 = Point(2, 1)
         expected_2 = {Point(0, 0): 3, Point(1, 0): 2, Point(2, 0): 1,
-                    Point(0, 1): 2, Point(1, 1): 1, Point(2, 1): 0,
-                    Point(0, 2): 4, Point(1, 2): 3, Point(2, 2): 2}
+                      Point(0, 1): 2, Point(1, 1): 1, Point(2, 1): 0,
+                      Point(0, 2): 4, Point(1, 2): 3, Point(2, 2): 2}
         answer = RangeFinder(the_map).get_distances(origin_2, 5)
         self.assertEqual(expected_2, answer)
 
-    def test_for_oscar(self):
+    def test_get_distance_non_uniform_terrain(self):
+        terrain_mvs = {Point(0, 0): 1, Point(1, 0): 2,
+                       Point(0, 1): 4, Point(1, 1): 3}
 
-        print(self.ranger.get_all_points(Point(1, 1), 5))
+        tiles = [Tile(point=point, terrain_mv=terrain) for point, terrain in terrain_mvs.items()]
+        map_ = Map(2, 2, tiles)
+        origin = Point(0, 0)
+        expected = {Point(0, 0): 0, Point(1, 0): 1,
+                    Point(0, 1): 1, Point(1, 1): 3}
+        self.assertEqual(RangeFinder(map_).get_distances(origin, 2), expected)
 
+        origin = Point(0, 1)
+        expected = {Point(0, 0): 4, Point(1, 0): 5,
+                    Point(0, 1): 0, Point(1, 1): 4}
+        self.assertEqual(RangeFinder(map_).get_distances(origin, 2), expected)
+
+    def test_get_distance_chooses_smallest_move_pts(self):
 
         elevations = {Point(0, 0): 0, Point(1, 0): 0,
                       Point(0, 1): 1, Point(1, 1): 2}
@@ -113,5 +142,52 @@ class TestRangeFinder(unittest.TestCase):
         map_ = Map(2, 2, tiles)
         origin = Point(0, 1)
         expected = {Point(0, 0): 1, Point(1, 0): 2,  # point(1, 0) has two different ways from 0,1
-                  Point(0, 1): 0, Point(1, 1): 2}  # one way costs 2 and one way costs 3
+                    Point(0, 1): 0, Point(1, 1): 2}  # one way costs 2 and one way costs 3
         self.assertEqual(RangeFinder(map_).get_distances(origin, 2), expected)
+
+    def test_get_distance_chooses_smallest_move_pts_different_order(self):
+
+        elevations = {Point(0, 0): 2, Point(1, 0): 0,
+                      Point(0, 1): 1, Point(1, 1): 0}
+
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(2, 2, tiles)
+        origin = Point(0, 1)
+        expected = {Point(0, 0): 2, Point(1, 0): 2,  # point(1, 0) has two different ways from 0,1
+                    Point(0, 1): 0, Point(1, 1): 1}  # one way costs 2 and one way costs 3
+        self.assertEqual(RangeFinder(map_).get_distances(origin, 2), expected)
+
+    def test_get_distance_elevations_and_terrains(self):
+        elevation_terrain = {Point(0, 0): (0, 3), Point(1, 0): (0, 4),
+                             Point(0, 1): (1, 5), Point(1, 1): (2, 6)}
+        tiles = [Tile(point=point, elevation=el_terrain[0], terrain_mv=el_terrain[1])
+                 for point, el_terrain in elevation_terrain.items()]
+        map_ = Map(2, 2, tiles)
+
+        origin = Point(0, 1)
+        expected = {Point(0, 0): 5, Point(1, 0): 8,
+                    Point(0, 1): 0, Point(1, 1): 6}
+        self.assertEqual(RangeFinder(map_).get_distances(origin, 2), expected)
+
+        origin = Point(0, 0)
+        expected = {Point(0, 0): 0, Point(1, 0): 3,
+                    Point(0, 1): 4, Point(1, 1): 9}
+        self.assertEqual(RangeFinder(map_).get_distances(origin, 2), expected)
+
+    def test_get_distance_with_impassable_tile_in_place(self):
+        elevations = {Point(0, 0): 2, Point(1, 0): 0, Point(2, 0): 3,
+                      Point(0, 1): 1, Point(1, 1): 9, Point(2, 1): 2,
+                      Point(0, 2): 2, Point(1, 2): 0, Point(2, 2): 1}
+        tiles = [Tile(point=point, elevation=elevation) if elevation != 9 else ImpassableTile(point=point)
+                 for point, elevation in elevations.items()]
+        map_ = Map(3, 3, tiles)
+
+        origin = Point(1, 2)
+        expected = {Point(0, 0): 6, Point(1, 0): 7, Point(2, 0): 6,
+                    Point(0, 1): 4, Point(1, 1): float('inf'), Point(2, 1): 4,
+                    Point(0, 2): 3, Point(1, 2): 0, Point(2, 2): 2}
+        print(RangeFinder(map_).get_distances(origin, 5))
+        self.assertEqual(RangeFinder(map_).get_distances(origin, 5), expected)
+        # This fails on Point(1, 0): float('inf') . This happens because it never checks from Point(0, 0)
+        # or Point(2, 0).  They are at distance= 3, but Point(1, 0) is at distance=2.
+
