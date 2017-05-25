@@ -62,9 +62,9 @@ class RangeFinder(object):
                             temp_edges.add(new_edge)
                         elif mv < points_to_mvpts[new_edge]:
                             points_to_mvpts[new_edge] = mv
+                            temp_edges.add(new_edge)
 
             edges = temp_edges.copy()
-        print(sorted(edges))
         return {point: value for point, value in points_to_mvpts.items() if value <= max_mv}
 
     def get_mv_pts(self, start, finish):
