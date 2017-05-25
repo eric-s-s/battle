@@ -28,7 +28,7 @@ class RangeFinder(object):
             distances_to_units[distance] = units
         return distances_to_units
 
-    def get_move_points(self, origin: Point, max_mv: int) -> dict:
+    def proto_range_finder_no_tests_needs_work(self, origin: Point, max_mv: int) -> dict:
         point_to_mvpts = {origin: 0}
 
         distances = self.get_all_points(origin, max_mv)
@@ -46,35 +46,41 @@ class RangeFinder(object):
                 point_to_mvpts[point] = point_value
         return point_to_mvpts
 
-    def get_move_pts_two(self, start, max_mv):
-        points_to_mvpts = {start: 0}
+    def get_movement_points(self, start, max_mv):
+        movement_points = {start: 0}
         edges = {start}
-        while not edges_gt_max(points_to_mvpts, edges, max_mv):
-            temp_edges = edges.copy()
-            for point in edges:
-                if points_to_mvpts[point] <= max_mv:
-                    temp_edges.discard(point)
-                    candidate_edges = point.at_distance(1)
-                    for new_edge in candidate_edges:
-                        mv = self.get_mv_pts(point, new_edge) + points_to_mvpts[point]
-                        if new_edge not in points_to_mvpts:
-                            points_to_mvpts[new_edge] = mv
-                            temp_edges.add(new_edge)
-                        elif mv < points_to_mvpts[new_edge]:
-                            points_to_mvpts[new_edge] = mv
-                            temp_edges.add(new_edge)
+        while not all_edges_gt_max_mv(movement_points, edges, max_mv):
+            edges, movement_points = self._update_edges_and_move_points(edges, movement_points, max_mv)
+        return {point: value for point, value in movement_points.items() if value <= max_mv}
 
-            edges = temp_edges.copy()
-        return {point: value for point, value in points_to_mvpts.items() if value <= max_mv}
+    def _update_edges_and_move_points(self, edges, movement_points, max_mv):
+        new_mv_pts = movement_points.copy()
+        new_edges = edges.copy()
+        for old_edge in edges:
+            if new_mv_pts[old_edge] <= max_mv:
+                new_edges.remove(old_edge)
+                new_edge_mv_pts = self._get_movement_pts_for_new_edges(old_edge, new_mv_pts)
+                new_edges.update(new_edge_mv_pts)
+                new_mv_pts.update(new_edge_mv_pts)
+        return new_edges, new_mv_pts
 
-    def get_mv_pts(self, start, finish):
+    def _get_movement_pts_for_new_edges(self, current_edge, current_movement_pts):
+        new_edges = {}
+        candidate_edges = current_edge.at_distance(1)
+        for new_edge in candidate_edges:
+            mv = self._get_mv_pts(current_edge, new_edge) + current_movement_pts[current_edge]
+            if new_edge not in current_movement_pts or mv < current_movement_pts[new_edge]:
+                new_edges[new_edge] = mv
+        return new_edges
+
+    def _get_mv_pts(self, start, finish):
         if self._map.can_place_unit(finish):
             return self._map.get_tile(start).move_pts(self._map.get_tile(finish))
         else:
             return float('inf')
 
 
-def edges_gt_max(points_dict, edges, max_mv):
+def all_edges_gt_max_mv(points_dict, edges, max_mv):
     return all(points_dict[edge] > max_mv for edge in edges)
 
 
