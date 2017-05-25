@@ -47,40 +47,59 @@ class RangeFinder(object):
         return point_to_mvpts
 
     def get_movement_points(self, start, max_mv):
+        """
+        Here is a strategy to get correct answer.
+
+        Think of searching until you find all the final edges.
+
+        ex:
+        elevations = {Point(0, 0): 9, Point(1, 0): 0,
+                      Point(0, 1): 1, Point(1, 1): 0}
+        start = Point(1, 1)
+        max_mv = 5
+        answer_with_final_edges = {
+                                                 Point(1, -1): inf,
+                               Point(0, 0): 9,   Point(1, 0): 1, Point(2, 0): inf,
+            Point(-1, 1): inf, Point(0, 1): 2,   Point(1, 1): 0, Point(2, 1): inf,
+                               Point(0, 2): inf, Point(1, 2): inf
+        }
+        You know you're done when all the edges of your map are final edges.
+        final_edges = {Point(1, -1), Point(0, 0), Point(2, 0), Point(-1, 1), Point(2, 1), Point(0, 2), Point(1, 2)}
+        return a dictionary with all the final edges removed. i.e.
+        answer = {
+                            Point(1, 0): 1,
+            Point(0, 1): 2, Point(1, 1): 0
+        }
+
+        read the new tests to see what you should be doing.  feel free to @unittest.expectedFailure over various tests
+        so that you can work on things one at a time.  i made a "pretty_print" function in the tests so that you
+        print out your answer to see what the heck it's doing.
+
+        SPOILERS BELOW.  iF YOU WANT TO TRY ON YOUR OWN, DELETE WITHOUT READING (you can always look at the closed
+        PR on github to see it later).  THE "NOTES:" PART IS LESS SPOILERY THAN THE NUMBERED LIST.
+
+        edges is a set that is the newest parts of exploration.
+        for each pt in edges:
+        1 - check to see if the pt is a final edge (it's got more mv_pts than max_mv)
+        2 - for each pt that's not a final edge,
+            a - remove it from edges set
+            b - for each adjacent pt to the removed point,
+                check if it's a new edge (think about why a pt would be considered a new edge)
+            c - add each new edge to the edges and update it's value in the movement_points dict
+        3 - if all your edges are final edges, you're done
+        4 - snip all the finished edges from the dictionary and return that dictionary
+
+        notes:
+        use "_get_mv_pts" below. it's convenient
+        in tests, if you want to see what you made, use "pretty_print"
+        remember when you're updating the edges that YOU CANNOT CHANGE A SET WHILE YOU'RE ITERATING THROUGH IT. make
+        a copy of the set to update and then make that the new set of edges.
+        """
+        edges = {start}  # this is a set.  if you don't know what that is, read the python documentation.
         movement_points = {start: 0}
-        edges = {start}
-        while not all_edges_gt_max_mv(movement_points, edges, max_mv):
-            edges, movement_points = self._update_edges_and_move_points(edges, movement_points, max_mv)
-        return {point: value for point, value in movement_points.items() if value <= max_mv}
-
-    def _update_edges_and_move_points(self, edges, movement_points, max_mv):
-        new_mv_pts = movement_points.copy()
-        new_edges = edges.copy()
-        for old_edge in edges:
-            if new_mv_pts[old_edge] <= max_mv:
-                new_edges.remove(old_edge)
-                new_edge_mv_pts = self._get_movement_pts_for_new_edges(old_edge, new_mv_pts)
-                new_edges.update(new_edge_mv_pts)
-                new_mv_pts.update(new_edge_mv_pts)
-        return new_edges, new_mv_pts
-
-    def _get_movement_pts_for_new_edges(self, current_edge, current_movement_pts):
-        new_edges = {}
-        candidate_edges = current_edge.at_distance(1)
-        for new_edge in candidate_edges:
-            mv = self._get_mv_pts(current_edge, new_edge) + current_movement_pts[current_edge]
-            if new_edge not in current_movement_pts or mv < current_movement_pts[new_edge]:
-                new_edges[new_edge] = mv
-        return new_edges
 
     def _get_mv_pts(self, start, finish):
         if self._map.can_place_unit(finish):
             return self._map.get_tile(start).move_pts(self._map.get_tile(finish))
         else:
             return float('inf')
-
-
-def all_edges_gt_max_mv(points_dict, edges, max_mv):
-    return all(points_dict[edge] > max_mv for edge in edges)
-
-
