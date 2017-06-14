@@ -82,14 +82,17 @@ class TestRangeFinder(unittest.TestCase):
     def test_get_movement_points_only_to_max_mv(self):
         map_ = Map(3, 3, [Tile() for _ in range(9)])
         answer = RangeFinder(map_).get_movement_points(Point(0, 0), 1)
-        expected = {Point(0, 0): 0,
-                    Point(0, 1): 1,
+        print('test_1')
+        pretty_print(answer)
+        expected = {Point(0, 0): 0, Point(0, 1): 1,
                     Point(1, 0): 1}
         self.assertEqual(answer, expected)
 
     def test_get_movement_points_only_includes_distances_on_map(self):
         map_ = Map(2, 2, [Tile() for _ in range(4)])
         answer = RangeFinder(map_).get_movement_points(Point(0, 0), 100)
+        print('test_2')
+        pretty_print(answer)
         expected = {Point(0, 0): 0,
                     Point(0, 1): 1,
                     Point(1, 0): 1,
@@ -313,17 +316,84 @@ def pretty_print(answer):
 
     Use this to see where your test answer differs from expected answer.
     """
-    sorted_results = sorted(answer.items())
-    max_pt = sorted_results[-1][0]
-    blank_space = ' ' * len('{!r}: {}'.format(*sorted_results[0]))
-    for y in range(max_pt.y + 1):
-        to_print = [(pt, val) for pt, val in sorted_results if pt.y == y]
-        for x in range(max_pt.x + 1):
-            pt, val = to_print[0]
-            if pt.x == x:
-                print('{!r}: {}'.format(pt, val), end=', ')
-                del to_print[0]
+    print(pretty_string(answer) + '\n\n')
+
+
+
+def pretty_string(answer):
+    y_vals = [pt.y for pt in answer]
+    x_vals = [pt.x for pt in answer]
+
+    blank_space = ' ' * len('{!r}: {}'.format(*next(iter(answer.items()))))
+    rows = []
+    for row in range(min(y_vals), max(y_vals) + 1):
+        row_entries = []
+        for column in range(min(x_vals), max(x_vals) + 1):
+            point = Point(column, row)
+            if point not in answer:
+                row_entries.append(blank_space)
             else:
-                print(blank_space, end=', ')
-            x += 1
-        print()
+                row_entries.append('{!r}: {}'.format(point, answer[point]))
+        rows.append(', '.join(row_entries))
+    return '\n'.join(rows)
+
+
+class TestPrettyString(unittest.TestCase):
+    def test_basic_square(self):
+
+        test = {Point(0, 0): 6, Point(1, 0): 5,
+                Point(0, 1): 4, Point(1, 1): 3,
+                Point(0, 2): 2, Point(1, 2): 1}
+        expected = ('Point(0, 0): 6, Point(1, 0): 5\n' +
+                    'Point(0, 1): 4, Point(1, 1): 3\n' +
+                    'Point(0, 2): 2, Point(1, 2): 1')
+        self.assertEqual(pretty_string(test), expected)
+
+    def test_basic_square_negative_values(self):
+
+        test = {Point(-1, -1): 6, Point(0, -1): 5,
+                Point(-1, 0): 6, Point(0, 0): 5,
+                Point(-1, 1): 4, Point(0, 1): 3,
+                Point(-1, 2): 2, Point(0, 2): 1}
+        expected = ('Point(-1, -1): 6, Point(0, -1): 5\n' +
+                    'Point(-1, 0): 6, Point(0, 0): 5\n' +
+                    'Point(-1, 1): 4, Point(0, 1): 3\n' +
+                    'Point(-1, 2): 2, Point(0, 2): 1')
+        self.assertEqual(pretty_string(test), expected)
+
+    def test_missing_corners_right(self):
+        test = {Point(0, 0): 6,
+                                Point(1, 1): 3,
+                Point(0, 2): 2}
+        expected = ('Point(0, 0): 6,               \n' +
+                    '              , Point(1, 1): 3\n' +
+                    'Point(0, 2): 2,               ')
+        self.assertEqual(pretty_string(test), expected)
+
+    def test_missing_corners_left(self):
+        test = {                Point(1, 0): 5,
+                Point(0, 1): 4,
+                                Point(1, 2): 1}
+        expected = ('              , Point(1, 0): 5\n' +
+                    'Point(0, 1): 4,               \n' +
+                    '              , Point(1, 2): 1')
+        self.assertEqual(pretty_string(test), expected)
+
+    def test_missing_row(self):
+        test = {Point(0, 0): 6, Point(1, 0): 5,
+
+                Point(0, 2): 2, Point(1, 2): 1}
+        expected = ('Point(0, 0): 6, Point(1, 0): 5\n' +
+                    '              ,               \n' +
+                    'Point(0, 2): 2, Point(1, 2): 1')
+        self.assertEqual(pretty_string(test), expected)
+
+    def test_missing_column(self):
+
+        test = {Point(0, 0): 6,                 Point(2, 0): 10,
+                Point(0, 1): 4,                 Point(2, 1): 20,
+                Point(0, 2): 2,                 Point(2, 2): 30}
+        expected = ('Point(0, 0): 6,               , Point(2, 0): 10\n' +
+                    'Point(0, 1): 4,               , Point(2, 1): 20\n' +
+                    'Point(0, 2): 2,               , Point(2, 2): 30')
+        self.assertEqual(pretty_string(test), expected)
