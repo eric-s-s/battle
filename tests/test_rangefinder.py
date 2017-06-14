@@ -99,6 +99,18 @@ class TestRangeFinder(unittest.TestCase):
                     Point(1, 1): 2}
         self.assertEqual(answer, expected)
 
+    def test_get_movement_points_not_affected_by_unit_on_origin(self):
+        map_ = Map(2, 2, [Tile() for _ in range(4)])
+        origin = Point(0, 0)
+        map_.place_unit(Soldier(), origin)
+        answer = RangeFinder(map_).get_movement_points(origin, 100)
+        pretty_print(answer)
+        expected = {Point(0, 0): 0,
+                    Point(0, 1): 1,
+                    Point(1, 0): 1,
+                    Point(1, 1): 2}
+        self.assertEqual(answer, expected)
+
     def test_get_movement_points_non_uniform_elevation(self):
         points_to_elevation = {Point(0, 0): 0, Point(1, 0): 1, Point(2, 0): 2,
                                Point(0, 1): 1, Point(1, 1): 2, Point(2, 1): 3,
@@ -186,6 +198,25 @@ class TestRangeFinder(unittest.TestCase):
         map_ = Map(3, 3, tiles)
 
         origin = Point(1, 2)
+        expected = {Point(0, 0): 6, Point(1, 0): 7, Point(2, 0): 6,
+                    Point(0, 1): 4,                 Point(2, 1): 4,
+                    Point(0, 2): 3, Point(1, 2): 0, Point(2, 2): 2}
+        self.assertEqual(RangeFinder(map_).get_movement_points(origin, 10), expected)
+
+    def test_get_movement_points_with_occupied_space_in_place(self):
+        elevations = {Point(0, 0): 2, Point(1, 0): 0, Point(2, 0): 3,
+                      Point(0, 1): 1, Point(1, 1): 0, Point(2, 1): 2,
+                      Point(0, 2): 2, Point(1, 2): 0, Point(2, 2): 1}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+
+        map_ = Map(3, 3, tiles)
+
+        occupied_point = Point(1, 1)
+        origin = Point(1, 2)
+
+        map_.place_unit(Soldier(), origin)
+        map_.place_unit(Soldier(), occupied_point)
+
         expected = {Point(0, 0): 6, Point(1, 0): 7, Point(2, 0): 6,
                     Point(0, 1): 4,                 Point(2, 1): 4,
                     Point(0, 2): 3, Point(1, 2): 0, Point(2, 2): 2}
@@ -317,7 +348,6 @@ def pretty_print(answer):
     Use this to see where your test answer differs from expected answer.
     """
     print(pretty_string(answer) + '\n\n')
-
 
 
 def pretty_string(answer):
