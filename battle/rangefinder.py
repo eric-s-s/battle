@@ -74,7 +74,7 @@ class RangeFinder(object):
         return mv_pts_update, new_edges
 
     def _get_mv_pts(self, start, finish):
-        if self._map.can_place_unit(finish) and self._map.can_place_unit(start):
+        if self._map.can_place_unit(finish):
             return self._map.get_tile(start).move_pts(self._map.get_tile(finish))
         else:
             return float('inf')
