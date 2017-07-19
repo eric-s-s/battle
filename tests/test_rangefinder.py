@@ -22,13 +22,13 @@ class TestRangeFinder(unittest.TestCase):
         range_finder = RangeFinder(map_)
         self.assertEqual(range_finder._map, map_)
 
-    def test_get_all_points_distance_zero(self):
+    def test_get_all_usable_points_distance_zero(self):
         origin = Point(1, 1)
-        self.assertEqual(self.ranger.get_all_points(origin, 0), {0: [origin]})
+        self.assertEqual(self.ranger.get_all_usable_points(origin, 0), {0: [origin]})
 
-    def test_get_all_points_distance(self):
+    def test_get_all_usable_points_distance(self):
         origin = Point(0, 0)
-        answer = self.ranger.get_all_points(origin, 2)
+        answer = self.ranger.get_all_usable_points(origin, 2)
         expected = {
             0: [origin],
             1: [Point(1, 0), Point(0, 1)],
@@ -36,25 +36,27 @@ class TestRangeFinder(unittest.TestCase):
         }
         self.assertEqual(answer, expected)
 
-    def test_get_all_points_does_not_include_points_not_on_map(self):
-        answer = self.ranger.get_all_points(Point(0, 0), 1)
+    def test_get_all_usable_points_does_not_include_points_not_on_map(self):
+        answer = self.ranger.get_all_usable_points(Point(0, 0), 1)
         self.assertEqual(answer, {0: [Point(0, 0)],
                                   1: [Point(1, 0), Point(0, 1)]})
 
-    def test_get_all_points_shortcut_for_distances_beyond_map(self):
+    def test_get_all_usable_points_shortcut_for_distances_beyond_map(self):
         expected = dict.fromkeys(range(0, 101), [])
         expected[0] = [Point(1, 1)]
         expected[1] = [Point(1, 0), Point(0, 1), Point(2, 1), Point(1, 2)]
         expected[2] = [Point(0, 0), Point(2, 0), Point(0, 2), Point(2, 2)]
-        self.assertEqual(self.ranger.get_all_points(Point(1, 1), 100), expected)
+        self.assertEqual(self.ranger.get_all_usable_points(Point(1, 1), 100), expected)
 
-    def test_get_all_points_includes_points_on_map_but_with_no_tile(self):
-        new_map = Map(3, 3, [])
+    def test_get_all_usable_points_does_not_include_points_on_map_but_with_no_tile(self):
+        new_map = Map(3, 3, [Tile(point=Point(0, 0)), Tile(point=Point(1, 0))])
         self.assertFalse(new_map.has_tile(Point(0, 1)))
+        self.assertTrue(new_map.has_tile(Point(0, 0)))
+        self.assertTrue(new_map.has_tile(Point(1, 0)))
         ranger = RangeFinder(new_map)
-        answer = ranger.get_all_points(Point(0, 0), 1)
+        answer = ranger.get_all_usable_points(Point(0, 0), 1)
         self.assertEqual(answer, {0: [Point(0, 0)],
-                                  1: [Point(1, 0), Point(0, 1)]})
+                                  1: [Point(1, 0)]})
 
     def test_get_all_units_no_units(self):
         answer = self.ranger.get_all_units(Point(0, 0), 2)
@@ -72,12 +74,54 @@ class TestRangeFinder(unittest.TestCase):
         self.assertIsNot(values[0], values[1])
         for point, unit in points_to_units.items():
             self.test_map.place_unit(unit, point)
-        distance_to_points = self.ranger.get_all_points(Point(0, 0), 6)
+        distance_to_points = self.ranger.get_all_usable_points(Point(0, 0), 6)
         answer = {}
         for distance, points in distance_to_points.items():
             soldiers = [points_to_units[point] for point in points]
             answer[distance] = soldiers
         self.assertEqual(answer, self.ranger.get_all_units(Point(0, 0), 6))
+
+    def test_get_sight_ranges(self):
+        points_to_elevation = {Point(0, 0): 0, Point(1, 0): 1, Point(2, 0): 1,
+                               Point(0, 1): 1, Point(1, 1): 2, Point(2, 1): 2,
+                               Point(0, 2): 2, Point(1, 2): 1, Point(2, 2): 4}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        origin = Point(0, 1)
+        answer = RangeFinder(the_map).get_sight_ranges(origin, 5)
+        expected = dict.fromkeys(range(0, 6), [])
+        expected[0] = [origin]
+        expected[1] = sorted([Point(0, 0), Point(1, 1), Point(0, 2)])
+        expected[2] = sorted([Point(1, 0), Point(2, 1), Point(1, 2)])
+        expected[3] = sorted([Point(2, 2)])
+
+        self.assertEqual(answer, expected)
+
+    def test_get_sight_ranges_missing_tile(self):
+        points_to_elevation = {Point(0, 0): 0, Point(1, 0): 1, Point(2, 0): 1,
+                               Point(0, 1): 1, Point(1, 1): 2, Point(2, 1): 2,
+                               Point(0, 2): 2,                 Point(2, 2): 4}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        self.assertTrue(the_map.is_on_map(Point(1, 2)))
+        self.assertFalse(the_map.has_tile(Point(1, 2)))
+
+        origin = Point(0, 1)
+        answer = RangeFinder(the_map).get_sight_ranges(origin, 5)
+        expected = dict.fromkeys(range(0, 6), [])
+        expected[0] = [origin]
+        expected[1] = sorted([Point(0, 0), Point(1, 1), Point(0, 2)])
+        expected[2] = sorted([Point(1, 0), Point(2, 1)])
+        expected[3] = sorted([Point(2, 2)])
+
+        self.assertEqual(answer, expected)
+
+    def test_get_sight_ranges_distance_zero(self):
+        origin = Point(0, 1)
+        answer = self.ranger.get_sight_ranges(origin, 0)
+        expected = {0: [origin]}
+
+        self.assertEqual(answer, expected)
 
     def test_get_movement_points_only_to_max_mv(self):
         map_ = Map(3, 3, [Tile() for _ in range(9)])

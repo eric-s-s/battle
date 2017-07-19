@@ -282,9 +282,37 @@ class TestLineOfSight(unittest.TestCase):
         tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
         map_ = Map(3, 4, tiles)
         sighting_tool = LineOfSight(map_)
-        target = Point(1, 3)
+        target_above = Point(1, 3)
+        target_equal = Point(1, 2)
         shooter = Point(2, 0)
-        self.assertFalse(sighting_tool.is_target_below_shooter(target, shooter))
+        self.assertFalse(sighting_tool.is_target_below_shooter(target_above, shooter))
+        self.assertFalse(sighting_tool.is_target_below_shooter(target_equal, shooter))
+
+    def test_is_target_above_shooter_true(self):
+        elevations = {Point(0, 0): 0, Point(1, 0): 2, Point(2, 0): 3,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 4, Point(1, 2): 3, Point(2, 2): 4,
+                      Point(0, 3): 0, Point(1, 3): 2, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        sighting_tool = LineOfSight(map_)
+        target = Point(2, 2)
+        shooter = Point(2, 0)
+        self.assertTrue(sighting_tool.is_target_above_shooter(target, shooter))
+
+    def test_is_target_above_shooter_false(self):
+        elevations = {Point(0, 0): 0, Point(1, 0): 2, Point(2, 0): 3,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 4, Point(1, 2): 3, Point(2, 2): 4,
+                      Point(0, 3): 0, Point(1, 3): 4, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        sighting_tool = LineOfSight(map_)
+        target_below = Point(1, 0)
+        target_equal = Point(1, 2)
+        shooter = Point(2, 0)
+        self.assertFalse(sighting_tool.is_target_above_shooter(target_below, shooter))
+        self.assertFalse(sighting_tool.is_target_above_shooter(target_equal, shooter))
 
     def test_get_deltas_between_b_gt_a(self):
         a = 2

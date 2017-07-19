@@ -17,6 +17,9 @@ class LineOfSight(object):
     def is_target_below_shooter(self, target: Point, shooter: Point) -> bool:
         return self.get_elevation(target) < self.get_elevation(shooter)
 
+    def is_target_above_shooter(self, target: Point, shooter: Point) -> bool:
+        return self.get_elevation(target) > self.get_elevation(shooter)
+
     def is_obstacle_higher_than_start(self, start: Point, finish: Point) -> bool:
         slope = get_slope(start, finish)
         if -1 < slope < 1:
