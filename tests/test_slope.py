@@ -1,6 +1,6 @@
 import unittest
 
-from battle.slope import Slopey, get_slope
+from battle.slope import Slopey, get_slope, get_deltas_between
 from battle.maptools.tile import Tile
 from battle.maptools.map import Map
 from battle.maptools.point import Point
@@ -139,6 +139,268 @@ class TestSlopey(unittest.TestCase):
         start = Point(0, 3)
         finish = Point(2, 0)
         self.assertTrue(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_slope_gt_one_false(self):
+        elevations = {Point(0, 0): 0, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 1, Point(2, 2): 0,
+                      Point(0, 3): 2, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 3)
+        finish = Point(2, 0)
+        self.assertFalse(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_slope_lt_one_pos_true(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 1, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 1, Point(2, 2): 0,
+                      Point(0, 3): 2, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 0)
+        finish = Point(2, 1)
+        self.assertTrue(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_slope_lt_one_pos_false(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 0, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 1, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 1, Point(2, 2): 0,
+                      Point(0, 3): 2, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 0)
+        finish = Point(2, 1)
+        self.assertFalse(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_slope_gt_neg_one_neg_true(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 2, Point(2, 2): 0,
+                      Point(0, 3): 1, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 3)
+        finish = Point(2, 2)
+        self.assertTrue(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_slope_gt_neg_one_neg_false(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 1, Point(2, 2): 1,
+                      Point(0, 3): 1, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 3)
+        finish = Point(2, 2)
+        self.assertFalse(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_slope_lt_neg_one_false(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 1, Point(2, 2): 1,
+                      Point(0, 3): 2, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 3)
+        finish = Point(1, 0)
+        self.assertFalse(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_slope_lt_neg_one_true(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 0, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 3, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 1, Point(2, 2): 1,
+                      Point(0, 3): 2, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 3)
+        finish = Point(1, 0)
+        self.assertTrue(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_x_axis_pos_direction_true(self):
+        elevations = {Point(0, 0): 0, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 3, Point(2, 2): 0,
+                      Point(0, 3): 0, Point(1, 3): 2, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 0)
+        finish = Point(2, 0)
+        self.assertTrue(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_x_axis_pos_direction_false(self):
+        elevations = {Point(0, 0): 2, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 3, Point(2, 2): 0,
+                      Point(0, 3): 0, Point(1, 3): 2, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 0)
+        finish = Point(2, 0)
+        self.assertFalse(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_x_axis_neg_direction_true(self):
+        elevations = {Point(0, 0): 0, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 3, Point(2, 2): 0,
+                      Point(0, 3): 0, Point(1, 3): 2, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(2, 2)
+        finish = Point(0, 2)
+        self.assertTrue(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_x_axis_neg_direction_false(self):
+        elevations = {Point(0, 0): 0, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 4, Point(1, 2): 3, Point(2, 2): 4,
+                      Point(0, 3): 0, Point(1, 3): 2, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(2, 2)
+        finish = Point(0, 2)
+        self.assertFalse(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_target_below_shooter_true(self):
+        elevations = {Point(0, 0): 0, Point(1, 0): 2, Point(2, 0): 3,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 4, Point(1, 2): 3, Point(2, 2): 4,
+                      Point(0, 3): 0, Point(1, 3): 2, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        target = Point(1, 3)
+        shooter = Point(2, 0)
+        self.assertTrue(slopey.is_target_below_shooter(target, shooter))
+
+    def test_is_target_below_shooter_false(self):
+        elevations = {Point(0, 0): 0, Point(1, 0): 2, Point(2, 0): 3,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 4, Point(1, 2): 3, Point(2, 2): 4,
+                      Point(0, 3): 0, Point(1, 3): 4, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        target = Point(1, 3)
+        shooter = Point(2, 0)
+        self.assertFalse(slopey.is_target_below_shooter(target, shooter))
+
+    def test_is_higher_than_start_by_bounding_ys_slope_lt_one_pos_true(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 1, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 1, Point(2, 2): 0,
+                      Point(0, 3): 2, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 0)
+        finish = Point(2, 1)
+        self.assertTrue(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_higher_than_start_by_bounding_ys_slope_lt_one_pos_false(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 0, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 1, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 1, Point(2, 2): 0,
+                      Point(0, 3): 2, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 0)
+        finish = Point(2, 1)
+        self.assertFalse(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_higher_than_start_by_bounding_ys_slope_gt_neg_one_neg_true(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 2, Point(2, 2): 0,
+                      Point(0, 3): 1, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 3)
+        finish = Point(2, 2)
+        self.assertTrue(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_higher_than_start_by_bounding_ys_slope_gt_neg_one_neg_false(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 1, Point(2, 2): 1,
+                      Point(0, 3): 1, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 3)
+        finish = Point(2, 2)
+        self.assertFalse(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_higher_than_start_by_bounding_xs_slope_gt_one_true(self):
+        elevations = {Point(0, 0): 0, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 3, Point(2, 2): 0,
+                      Point(0, 3): 2, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 3)
+        finish = Point(2, 0)
+        self.assertTrue(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_higher_than_start_by_bounding_xs_slope_gt_one_false(self):
+        elevations = {Point(0, 0): 0, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 1, Point(2, 2): 0,
+                      Point(0, 3): 2, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 3)
+        finish = Point(2, 0)
+        self.assertFalse(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_higher_than_start_by_bounding_xs_slope_lt_neg_one_false(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 1, Point(2, 2): 1,
+                      Point(0, 3): 2, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 3)
+        finish = Point(1, 0)
+        self.assertFalse(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_higher_than_start_by_bounding_xs_slope_lt_neg_one_true(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 0, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 3, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 1, Point(2, 2): 1,
+                      Point(0, 3): 2, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        slopey = Slopey(map_)
+        start = Point(0, 3)
+        finish = Point(1, 0)
+        self.assertTrue(slopey.is_obstacle_higher_than_start(start, finish))
+
+    def test_get_deltas_between_b_gt_a(self):
+        a = 2
+        b = 6
+        self.assertTrue(get_deltas_between(a, b), range(1, 4))
+
+    def test_get_deltas_between_a_gt_b(self):
+        a = 4
+        b = 1
+        self.assertTrue(get_deltas_between(a, b), range(-1, -3))
 
 
 

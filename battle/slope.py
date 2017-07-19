@@ -29,12 +29,12 @@ class Slopey(object):
         use floor and ceil
         """
         slope = get_slope(start, finish)
-        for x in get_deltas_between(start.x, finish.x):
-            y_1 = floor(slope * x)
-            y_2 = ceil(slope * x)
-            if self.get_elevation(Point(x, int(y_1))) > self.get_elevation(start):
+        for delta_x in get_deltas_between(start.x, finish.x):
+            delta_y_1 = floor(slope * delta_x)
+            delta_y_2 = ceil(slope * delta_x)
+            if self.get_elevation(start.plus(delta_x, delta_y_1)) > self.get_elevation(start):
                 return True
-            if self.get_elevation(Point(x, int(y_2))) > self.get_elevation(start):
+            if self.get_elevation(start.plus(delta_x, delta_y_2)) > self.get_elevation(start):
                 return True
         return False
 
