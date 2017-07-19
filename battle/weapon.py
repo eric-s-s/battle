@@ -1,9 +1,13 @@
+from typing import Union
+
 
 class Weapon(object):
-    def __init__(self, atk_dmg, range_):
+    def __init__(self, atk_dmg: int, range_: int, max_ammo: Union[int, float] = float('inf')):
         self._raise_error_for_bad_input(atk_dmg, range_)
         self._atk_dmg = atk_dmg
         self._range = range_
+        self._current_ammo = max_ammo
+        self._max_ammo = max_ammo
 
     @staticmethod
     def _raise_error_for_bad_input(atk_dmg, range_):
@@ -18,9 +22,17 @@ class Weapon(object):
     def range(self):
         return self._range
 
+    @property
+    def current_ammo(self):
+        return self._current_ammo
+
+    def refill_ammo(self):
+        self._current_ammo = self._max_ammo
+
 
 class SniperRifle(Weapon):
     def __init__(self):
         dmg = 50
         range_ = 10
-        super(SniperRifle, self).__init__(dmg, range_)
+        ammo = 10
+        super(SniperRifle, self).__init__(dmg, range_, ammo)
