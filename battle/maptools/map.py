@@ -19,7 +19,7 @@ class Map(object):
     def __init__(self, width: int, height: int, tiles: List[Tile]):
         try:
             self._ground_map = GroundMap(width, height, tiles)
-            self._air_map = AirMap(width, height, tiles)
+            self._air_map = AirMap(self._ground_map.get_ground_elevations())
         except GroundMapPlacementError as error:
             message = error.args[0]
             raise MapPlacementError(message)

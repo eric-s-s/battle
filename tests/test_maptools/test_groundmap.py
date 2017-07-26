@@ -58,13 +58,13 @@ class TestGroundMap(unittest.TestCase):
         for point in Point(0, 2).to_rectangle(3, 1):
             self.assertFalse(test_map.has_tile(point))
 
-    def test_get_all_elevations(self):
+    def test_get_ground_elevations(self):
         points_to_elevation = {Point(0, 0): 0, Point(1, 0): -1,
                                Point(0, 1): 1, }
         tiles = [Tile(elevation=elevation, point=point, terrain_mv=100)
                  for point, elevation in points_to_elevation.items()]
         the_map = GroundMap(2, 2, tiles)
-        self.assertEqual(the_map.get_all_elevations(),
+        self.assertEqual(the_map.get_ground_elevations(),
                          {Point(0, 0): 0, Point(1, 0): -1, Point(0, 1): 1, Point(1, 1): float('-inf')})
 
     def test_get_size(self):

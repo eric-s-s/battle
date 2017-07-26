@@ -46,7 +46,7 @@ class GroundMap(object):
             tile.set_point(point)
             self._tiles[point] = tile
 
-    def get_all_elevations(self):
+    def get_ground_elevations(self):
         return {point: self._get_elevation(point) for point in self._all_points}
 
     def _get_elevation(self, point: Point) -> Union[int, float]:
