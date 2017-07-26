@@ -324,7 +324,7 @@ class TestLineOfSight(unittest.TestCase):
         b = 1
         self.assertEqual(get_deltas_between(a, b), range(-1, -3, -1))
 
-    def test_can_hit_target_missing_tile(self):
+    def test_can_sight_target_missing_tile(self):
         elevations = {Point(0, 0): 1, Point(1, 0): 0, Point(2, 0): 0,
                       Point(0, 1): 0, Point(1, 1): 3, Point(2, 1): 5,
                                       Point(1, 2): 1,
@@ -340,7 +340,7 @@ class TestLineOfSight(unittest.TestCase):
         shooter_false = Point(2, 0)
         self.assertFalse(sighting_tool.can_sight_target(target_false, shooter_false))
 
-    def test_can_hit_target_target_higher(self):
+    def test_can_sight_target_target_higher(self):
         elevations = {Point(0, 0): 0, Point(1, 0): 2, Point(2, 0): 4,
                       Point(0, 1): 0, Point(1, 1): 5, Point(2, 1): 1,
                       Point(0, 2): 1, Point(1, 2): 1, Point(2, 2): 4,
@@ -358,7 +358,7 @@ class TestLineOfSight(unittest.TestCase):
         self.assertTrue(sighting_tool.can_sight_target(target, shooter_hit_1))
         self.assertTrue(sighting_tool.can_sight_target(target, shooter_hit_2))
 
-    def test_can_hit_target_target_lower(self):
+    def test_can_sight_target_target_lower(self):
         elevations = {Point(0, 0): 4, Point(1, 0): 2, Point(2, 0): 0,
                       Point(0, 1): 4, Point(1, 1): 5, Point(2, 1): 1,
                       Point(0, 2): 1, Point(1, 2): 1, Point(2, 2): 4,

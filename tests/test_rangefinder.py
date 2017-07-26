@@ -48,7 +48,7 @@ class TestRangeFinder(unittest.TestCase):
         expected[2] = [Point(0, 0), Point(2, 0), Point(0, 2), Point(2, 2)]
         self.assertEqual(self.ranger.get_all_usable_points(Point(1, 1), 100), expected)
 
-    def test_get_all_usable_points_does_not_include_points_on_map_but_with_no_tile(self):
+    def test_get_all_usable_points_does_not_include_points_on_map_with_no_tile(self):
         new_map = Map(3, 3, [Tile(point=Point(0, 0)), Tile(point=Point(1, 0))])
         self.assertFalse(new_map.has_tile(Point(0, 1)))
         self.assertTrue(new_map.has_tile(Point(0, 0)))
