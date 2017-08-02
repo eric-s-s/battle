@@ -1,5 +1,4 @@
 from math import floor, ceil
-from typing import Union
 from battle.maptools.point import Point
 from battle.maptools.map import Map
 
@@ -15,10 +14,10 @@ class LineOfSight(object):
             return not self.is_obstacle_higher_than_start(target, shooter)
 
     def is_target_below_shooter(self, target: Point, shooter: Point) -> bool:
-        return self.get_elevation(target) < self.get_elevation(shooter)
+        return self.map.get_elevation(target) < self.map.get_elevation(shooter)
 
     def is_target_above_shooter(self, target: Point, shooter: Point) -> bool:
-        return self.get_elevation(target) > self.get_elevation(shooter)
+        return self.map.get_elevation(target) > self.map.get_elevation(shooter)
 
     def is_obstacle_higher_than_start(self, start: Point, finish: Point) -> bool:
         slope = get_slope(start, finish)
@@ -35,9 +34,9 @@ class LineOfSight(object):
         for delta_x in get_deltas_between(start.x, finish.x):
             delta_y_1 = floor(slope * delta_x)
             delta_y_2 = ceil(slope * delta_x)
-            if self.get_elevation(start.plus(delta_x, delta_y_1)) > self.get_elevation(start):
+            if self.map.get_elevation(start.plus(delta_x, delta_y_1)) > self.map.get_elevation(start):
                 return True
-            if self.get_elevation(start.plus(delta_x, delta_y_2)) > self.get_elevation(start):
+            if self.map.get_elevation(start.plus(delta_x, delta_y_2)) > self.map.get_elevation(start):
                 return True
         return False
 
@@ -46,16 +45,11 @@ class LineOfSight(object):
         for delta_y in get_deltas_between(start.y, finish.y):
             delta_x_1 = floor(delta_y / slope)
             delta_x_2 = ceil(delta_y / slope)
-            if self.get_elevation(start.plus(delta_x_1, delta_y)) > self.get_elevation(start):
+            if self.map.get_elevation(start.plus(delta_x_1, delta_y)) > self.map.get_elevation(start):
                 return True
-            if self.get_elevation(start.plus(delta_x_2, delta_y)) > self.get_elevation(start):
+            if self.map.get_elevation(start.plus(delta_x_2, delta_y)) > self.map.get_elevation(start):
                 return True
         return False
-
-    def get_elevation(self, point: Point) -> Union[int, float]:
-        if not self.map.has_tile(point):
-            return float('-inf')
-        return self.map.get_tile(point).get_elevation()
 
 
 def get_slope(start: Point, finish: Point) -> float:

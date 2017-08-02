@@ -1,8 +1,8 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from battle.maptools.direction import Direction
 from battle.maptools.point import Point
-from battle.maptools.tile import Tile, ImpassableTile
+from battle.maptools.tile import Tile
 from battle.units import Soldier
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
@@ -44,6 +44,11 @@ class Map(object):
             point = available_points.pop(0)
             tile.set_point(point)
             self._tiles[point] = tile
+
+    def get_elevation(self, point: Point) -> Union[int, float]:
+        if not self.has_tile(point):
+            return float('-inf')
+        return self.get_tile(point).get_elevation()
 
     def get_size(self):
         last_point = self._all_points[-1]
