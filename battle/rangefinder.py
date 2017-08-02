@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from battle.maptools.map import Map
 from battle.maptools.point import Point
@@ -37,11 +37,23 @@ class RangeFinder(object):
                 for key, val in points.items()}
 
     def get_attack_ranges_ranged(self, origin: Point, range_: int) -> dict:
-        """return dict of ranges: [(point, advantage_value)]"""
-        # self._sighter.is_target_below_shooter()
-        # self._sighter.is_target_above_shooter()
-        # if higher,  elif lower,  else (equal)
-        return {0: [(origin, 0)]}
+        distance_point_dict = self.get_sight_ranges(origin, range_)
+        new_dict = {distance: self._get_advantage_list(origin, points)
+                    for distance, points in distance_point_dict.items()}
+        return new_dict
+
+    def _get_advantage_list(self, shooter: Point, targets: List[Point]) -> List[Tuple[Point, int]]:
+        return [(point, self._get_advantage_value(shooter, point)) for point in targets]
+
+    def _get_advantage_value(self, shooter: Point, target: Point) -> int:
+        shooter_el = self._map.get_elevation(shooter)
+        target_el = self._map.get_elevation(target)
+        if shooter_el > target_el:
+            return 1
+        elif shooter_el < target_el:
+            return -1
+        else:
+            return 0
 
     def get_attack_ranges_melee(self, origin: Point, range_: int = 1) -> dict:
         """return dict of ranges: [(point, advantage_value)]

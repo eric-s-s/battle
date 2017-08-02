@@ -123,6 +123,42 @@ class TestRangeFinder(unittest.TestCase):
 
         self.assertEqual(answer, expected)
 
+    def test_get_attack_ranges_ranged_no_points_off_map(self):
+        points_to_elevation = {Point(0, 0): 0, Point(1, 0): -1, Point(2, 0): 1,
+                               Point(0, 1): 1, Point(1, 1): 2, Point(2, 1): 2,
+                               Point(0, 2): 2, Point(1, 2): 4, Point(2, 2): 4}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        origin = Point(1, 1)
+        expected = {0: [(origin, 0)],
+                    1: sorted([(Point(1, 0), 1), (Point(0, 1), 1), (Point(1, 2), -1), (Point(2, 1), 0)]),
+                    2: sorted([(Point(0, 0), 1), (Point(2, 0), 1), (Point(0, 2), 0), (Point(2, 2), -1)])}
+        self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_ranged(origin, 2))
+
+    def test_get_attack_ranges_missing_tiles(self):
+        raise NotImplementedError
+
+    def test_get_attack_ranges_ranged_with_obstacles(self):
+        raise NotImplementedError
+
+    def test_get_attack_ranges_melee_target_advantage_values(self):
+        raise NotImplementedError
+
+    def test_get_attack_ranges_melee_target_too_high(self):
+        raise NotImplementedError
+
+    def test_get_attack_ranges_melee_target_too_low(self):
+        raise NotImplementedError
+
+    def test_get_attack_ranges_melee_default_distance(self):
+        raise NotImplementedError
+
+    def test_get_attack_ranges_melee_set_distance_value(self):
+        raise NotImplementedError
+
+    def test_get_attack_ranges_melee_set_distance_value_wiht_obstacle(self):
+        raise NotImplementedError
+
     def test_get_movement_points_only_to_max_mv(self):
         map_ = Map(3, 3, [Tile() for _ in range(9)])
         answer = RangeFinder(map_).get_movement_points(Point(0, 0), 1)
