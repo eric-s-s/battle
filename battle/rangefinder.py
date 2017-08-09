@@ -58,7 +58,26 @@ class RangeFinder(object):
     def get_attack_ranges_melee(self, origin: Point, range_: int = 1) -> dict:
         """return dict of ranges: [(point, advantage_value)]
                 elevation limit is +/- 3"""
-        return {0: [(origin, 0)]}
+        raw_answer = self.get_attack_ranges_ranged(origin, range_)
+
+        answer = {distance: self._filter_by_melee_reach(point_advantage_list, origin)
+                  for distance, point_advantage_list in raw_answer.items()}
+        return answer
+
+    def _filter_by_melee_reach(self, point_advantage_list, origin):
+        melee_reach_limit = 3
+        new_list = [point_advantage for point_advantage in point_advantage_list if
+                    self._is_elevation_in_range(origin, point_advantage[0], melee_reach_limit)]
+        return new_list
+
+    def _is_elevation_in_range(self, shooter: Point, target: Point, el_range: int):
+        shooter_el = self._map.get_elevation(shooter)
+        target_el = self._map.get_elevation(target)
+        distance = abs(shooter_el - target_el)
+        if distance <= el_range:
+            return True
+        else:
+            return False
 
     def get_movement_points(self, start: Point, max_mv: int) -> Dict[Point, int]:
         edges = {start}
