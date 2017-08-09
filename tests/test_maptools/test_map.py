@@ -62,6 +62,24 @@ class TestMap(unittest.TestCase):
         to_test = Map(3, 5, [])
         self.assertEqual(to_test.get_size(), (3, 5))
 
+    def test_get_elevation(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 2,
+                      Point(0, 1): -1, Point(1, 1): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(2, 2, tiles)
+        self.assertEqual(map_.get_elevation(Point(0, 0)), 1)
+        self.assertEqual(map_.get_elevation(Point(1, 0)), 2)
+        self.assertEqual(map_.get_elevation(Point(0, 1)), -1)
+        self.assertEqual(map_.get_elevation(Point(1, 1)), 0)
+
+    def test_get_elevation_empty_tile_and_not_on_map(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 2,
+                      Point(0, 1): -1, }
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(2, 2, tiles)
+        self.assertEqual(map_.get_elevation(Point(1, 1)), float('-inf'))
+        self.assertEqual(map_.get_elevation(Point(-1, -1)), float('-inf'))
+
     def test_is_on_map_true(self):
         points = Point(0, 0).to_rectangle(self.width, self.height)
         for point in points:

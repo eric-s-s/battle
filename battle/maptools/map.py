@@ -1,8 +1,8 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from battle.maptools.direction import Direction
 from battle.maptools.point import Point
-from battle.maptools.tile import Tile, ImpassableTile
+from battle.maptools.tile import Tile
 from battle.units import Soldier
 from battle.maptools.groundmap import GroundMap, GroundMapPlacementError
 from battle.maptools.airmap import AirMap
@@ -23,6 +23,11 @@ class Map(object):
         except GroundMapPlacementError as error:
             message = error.args[0]
             raise MapPlacementError(message)
+
+    def get_elevation(self, point: Point) -> Union[int, float]:
+        if not self.has_tile(point):
+            return float('-inf')
+        return self.get_tile(point).get_elevation()
 
     def get_size(self):
         return self._ground_map.get_size()

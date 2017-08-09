@@ -49,25 +49,7 @@ class TestLineOfSight(unittest.TestCase):
         slope = get_slope(point_1, point_2)
         self.assertEqual(slope, 0)
 
-    def test_get_elevation(self):
-        elevations = {Point(0, 0): 1, Point(1, 0): 2,
-                      Point(0, 1): -1, Point(1, 1): 0}
-        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
-        map_ = Map(2, 2, tiles)
-        sighting_tool = LineOfSight(map_)
-        self.assertEqual(sighting_tool.get_elevation(Point(0, 0)), 1)
-        self.assertEqual(sighting_tool.get_elevation(Point(1, 0)), 2)
-        self.assertEqual(sighting_tool.get_elevation(Point(0, 1)), -1)
-        self.assertEqual(sighting_tool.get_elevation(Point(1, 1)), 0)
 
-    def test_get_elevation_empty_tile_and_not_on_map(self):
-        elevations = {Point(0, 0): 1, Point(1, 0): 2,
-                      Point(0, 1): -1, }
-        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
-        map_ = Map(2, 2, tiles)
-        sighting_tool = LineOfSight(map_)
-        self.assertEqual(sighting_tool.get_elevation(Point(1, 1)), float('-inf'))
-        self.assertEqual(sighting_tool.get_elevation(Point(-1, -1)), float('-inf'))
 
     def test_is_obstacle_higher_than_start_y_axis_pos_direction_true(self):
         elevations = {Point(0, 0): 0, Point(1, 0): 2, Point(2, 0): 0,
