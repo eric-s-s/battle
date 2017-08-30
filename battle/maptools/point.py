@@ -74,6 +74,13 @@ class Point(object):
                 out.append(self.plus(del_x, del_y))
         return sorted(out)
 
+    def follow_path(self, path: List[Direction]) -> List['Point']:
+        out = [self]
+        for direction in path:
+            new_point = out[-1].in_direction(direction)
+            out.append(new_point)
+        return out
+
 
 def get_range(stop_by):
     if stop_by < 0:

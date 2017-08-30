@@ -153,6 +153,8 @@ class TestPoint(unittest.TestCase):
                   Point(-2, 1), Point(-1, 1), Point(0, 1)]
         self.assertEqual(Point(0, 0).to_rectangle(-3, 2), answer)
 
+    def test_follow_path(self):
+        raise NotImplementedError
 
 if __name__ == '__main__':
     unittest.main()
