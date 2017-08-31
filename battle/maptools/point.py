@@ -29,13 +29,13 @@ class Point(object):
     def __lt__(self, other: 'Point'):
         return (self.y, self.x) < (other.y, other.x)
 
-    def __le__(self, other):
+    def __le__(self, other: 'Point'):
         return self == other or self < other
 
-    def __gt__(self, other):
+    def __gt__(self, other: 'Point'):
         return not self <= other
 
-    def __ge__(self, other):
+    def __ge__(self, other: 'Point'):
         return not self < other
 
     def __repr__(self):
