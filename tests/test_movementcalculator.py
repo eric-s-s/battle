@@ -376,24 +376,22 @@ class TestMovementCalculator(unittest.TestCase):
                     Point(0, 1): (4, [N]), Point(1, 1): (9, [E, N])}
         self.assertEqual(MovementCalculator(map_).get_movement_points_with_path(origin, 10), expected)
 
-    # def test_get_movement_points_with_path_elevations_and_terrains_different_order(self):
-    #     elevation_terrain = {Point(0, 0): (2, 6), Point(1, 0): (0, 4),
-    #                          Point(0, 1): (1, 5), Point(1, 1): (0, 3)}
-    #     tiles = [Tile(point=point, elevation=el_terrain[0], terrain_mv=el_terrain[1])
-    #              for point, el_terrain in elevation_terrain.items()]
-    #     map_ = Map(2, 2, tiles)
-    #
-    #     origin = Point(0, 1)
-    #     expected = {Point(0, 0): (6, [S]), Point(1, 0): (8, [E, S]),
-    #                 Point(0, 1): (0, []), Point(1, 1): (5, [E])}
-    #     self.assertEqual(MovementCalculator(map_).get_movement_points_with_path(origin, 10), expected)
-    #
-    #     origin = Point(1, 0)
-    #     expected = {Point(0, 0): (6, [W]), Point(1, 0): (0, []),
-    #                 Point(0, 1): (8, [N, W]), Point(1, 1): (4, [N])}
-    #     pretty_print(expected)
-    #     pretty_print(MovementCalculator(map_).get_movement_points_with_path(origin, 10))
-    #     self.assertEqual(MovementCalculator(map_).get_movement_points_with_path(origin, 10), expected)
+    def test_get_movement_points_with_path_elevations_and_terrains_different_order(self):
+        elevation_terrain = {Point(0, 0): (2, 6), Point(1, 0): (0, 4),
+                             Point(0, 1): (1, 5), Point(1, 1): (0, 3)}
+        tiles = [Tile(point=point, elevation=el_terrain[0], terrain_mv=el_terrain[1])
+                 for point, el_terrain in elevation_terrain.items()]
+        map_ = Map(2, 2, tiles)
+
+        origin = Point(0, 1)
+        expected = {Point(0, 0): (6, [S]), Point(1, 0): (8, [E, S]),
+                    Point(0, 1): (0, []), Point(1, 1): (5, [E])}
+        self.assertEqual(MovementCalculator(map_).get_movement_points_with_path(origin, 10), expected)
+
+        origin = Point(1, 0)
+        expected = {Point(0, 0): (6, [W]), Point(1, 0): (0, []),
+                    Point(0, 1): (8, [N, W]), Point(1, 1): (4, [N])}
+        self.assertEqual(MovementCalculator(map_).get_movement_points_with_path(origin, 10), expected)
 
     def test_get_movement_points_with_path_with_impassable_tile_in_place(self):
         elevations = {Point(0, 0): 2, Point(1, 0): 0, Point(2, 0): 3,
