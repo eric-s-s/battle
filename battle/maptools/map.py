@@ -4,25 +4,46 @@ from battle.maptools.direction import Direction
 from battle.maptools.point import Point
 from battle.maptools.tile import Tile
 from battle.units import Soldier
-from battle.maptools.groundmap import GroundMap, GroundMapPlacementError
-from battle.maptools.airmap import AirMap
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 
 
 class MapPlacementError(ValueError):
-    def __init__(self, *args, **kwargs):
-        super(MapPlacementError, self).__init__(*args, **kwargs)
+    def __init__(self, *args):
+        super(MapPlacementError, self).__init__(*args)
 
 
 class Map(object):
     def __init__(self, width: int, height: int, tiles: List[Tile]):
-        try:
-            self._ground_map = GroundMap(width, height, tiles)
-            self._air_map = AirMap(self._ground_map.get_ground_elevations())
-        except GroundMapPlacementError as error:
-            message = error.args[0]
-            raise MapPlacementError(message)
+        self._all_points = Point(0, 0).to_rectangle(width, height)
+        self._tiles = dict.fromkeys(self._all_points, None)  # type: Dict[Point, Tile]
+        self._units = dict.fromkeys(self._all_points, None)  # type: Dict[Point, Soldier]
+
+        self._lay_tiles(tiles)
+
+    def _lay_tiles(self, tiles: List[Tile]):
+        pointed, pointless = separate_tiles(tiles)
+        self._lay_pointed_tiles(pointed)
+        self._lay_pointless_tiles(pointless)
+
+    def _lay_pointed_tiles(self, tiles: List[Tile]):
+        for tile in tiles:
+            self._raise_placement_error(tile)
+            point = tile.get_point()
+            self._tiles[point] = tile
+
+    def _raise_placement_error(self, tile: Tile):
+        point = tile.get_point()
+        if not self.is_on_map(point) or self.has_tile(point):
+            raise MapPlacementError('Occupied or missing')
+
+    def _lay_pointless_tiles(self, tiles: List[Tile]):
+        available_points = [key for key in self._all_points if not self._tiles[key]]
+        _raise_too_many_tiles_error(tiles, available_points)
+        for tile in tiles:
+            point = available_points.pop(0)
+            tile.set_point(point)
+            self._tiles[point] = tile
 
     def get_elevation(self, point: Point) -> Union[int, float]:
         if not self.has_tile(point):
@@ -30,42 +51,41 @@ class Map(object):
         return self.get_tile(point).get_elevation()
 
     def get_size(self):
-        return self._ground_map.get_size()
+        last_point = self._all_points[-1]
+        return last_point.x + 1, last_point.y + 1
 
     def is_on_map(self, point: Point) -> bool:
-        return self._ground_map.is_on_map(point)
+        return point in self._all_points
 
     def has_tile(self, point: Point) -> bool:
-        return self._ground_map.has_tile(point)
+        return self.is_on_map(point) and self._tiles[point]
 
     def get_tile(self, point: Point) -> Tile:
-        return self._ground_map.get_tile(point)
+        return self._tiles[point]
 
-    def can_place_unit(self, point: Point, elevation: int = None) -> bool:
-        return self._ground_map.can_place_unit(point)
+    def can_place_unit(self, point: Point) -> bool:
+        return self.has_tile(point) and self._units[point] is None
 
-    def place_unit(self, unit: Soldier, point: Point, elevation: int = None):
-        try:
-            self._ground_map.place_unit(unit, point)
-        except GroundMapPlacementError as error:
-            message = error.args[0]
-            raise MapPlacementError(message)
+    def place_unit(self, unit: Soldier, point: Point):
+        self._raise_unit_placement_error(point)
+        self._units[point] = unit
 
     def _raise_unit_placement_error(self, point: Point):
         if not self.can_place_unit(point):
             raise MapPlacementError('illegal unit placement')
 
-    def get_unit(self, point: Point, elevation: int = None) -> Soldier:
-        return self._ground_map.get_unit(point)
+    def get_unit(self, point: Point) -> Soldier:
+        return self._units[point]
 
-    def has_unit(self, point: Point, elevation: int = None) -> bool:
-        return self._ground_map.has_unit(point)
+    def has_unit(self, point: Point) -> bool:
+        return self._units.get(point) is not None
 
-    def remove_unit(self, point: Point, elevation: int = None):
-        self._ground_map.remove_unit(point)
+    def remove_unit(self, point: Point):
+        self._units[point] = None
 
     def remove_all_units(self):
-       self._ground_map.remove_all_units()
+        for key in self._units:
+            self._units[key] = None
 
 
 def separate_tiles(tiles):
