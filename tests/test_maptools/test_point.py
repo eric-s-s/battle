@@ -153,8 +153,47 @@ class TestPoint(unittest.TestCase):
                   Point(-2, 1), Point(-1, 1), Point(0, 1)]
         self.assertEqual(Point(0, 0).to_rectangle(-3, 2), answer)
 
-    def test_follow_path(self):
-        raise NotImplementedError
+    def test_generate_path_empty_list_yields_nothing(self):
+        point = Point(0, 0)
+        generator = point.generate_path([])
+        self.assertRaises(StopIteration, next, generator)
+
+    def test_generate_path_singleton_all_directions(self):
+        point = Point(0, 0)
+        for direction in Direction:
+            generator = point.generate_path([direction])
+            self.assertEqual(next(generator), Point(*direction.value))
+            self.assertRaises(StopIteration, next, generator)
+
+    def test_generate_path_many_points(self):
+        start = Point(0, 0)
+        generator = start.generate_path([N, S, E, W, N, N, W, W, S, E])
+        expected = [Point(0, 1),
+                    Point(0, 0),
+                    Point(1, 0),
+                    Point(0, 0),
+                    Point(0, 1),
+                    Point(0, 2),
+                    Point(-1, 2),
+                    Point(-2, 2),
+                    Point(-2, 1),
+                    Point(-1, 1)]
+        for pt in expected:
+            self.assertEqual(next(generator), pt)
+
+        self.assertRaises(StopIteration, next, generator)
+
+    def test_generate_path_start_not_origin(self):
+        start = Point(1, 2)
+        the_path = list(start.generate_path([N, E, S, W]))
+        expected = [Point(1, 3), Point(2, 3), Point(2, 2), Point(1, 2)]
+        self.assertEqual(the_path, expected)
+
+        start = Point(-1, -2)
+        the_path = list(start.generate_path([N, E, S, W]))
+        expected = [Point(-1, -1), Point(0, -1), Point(0, -2), Point(-1, -2)]
+        self.assertEqual(the_path, expected)
+
 
 if __name__ == '__main__':
     unittest.main()

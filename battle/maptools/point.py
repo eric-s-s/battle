@@ -1,5 +1,5 @@
 from battle.maptools.direction import Direction
-from typing import List, Any
+from typing import List, Any, Generator
 
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
@@ -74,12 +74,15 @@ class Point(object):
                 out.append(self.plus(del_x, del_y))
         return sorted(out)
 
-    def follow_path(self, path: List[Direction]) -> List['Point']:
-        out = [self]
-        for direction in path:
-            new_point = out[-1].in_direction(direction)
-            out.append(new_point)
-        return out
+    def generate_path(self, path: List[Direction]) -> Generator['Point', None, None]:
+
+        def path_generator(start, path_):
+            current = start
+            for direction in path_:
+                current = current.in_direction(direction)
+                yield current
+
+        return path_generator(self, path)
 
 
 def get_range(stop_by):
