@@ -73,3 +73,83 @@ class TestDirection(unittest.TestCase):
         for direction in Direction:
             self.assertIs(order[index], direction)
             index += 1
+
+    def test_lt(self):
+        self.assertTrue(S < N)
+        self.assertTrue(W < N)
+        self.assertTrue(E < N)
+        self.assertTrue(S < E)
+        self.assertTrue(W < E)
+        self.assertTrue(S < W)
+
+        self.assertFalse(N < W)
+        self.assertFalse(N < S)
+        self.assertFalse(N < E)
+        self.assertFalse(E < W)
+        self.assertFalse(E < S)
+        self.assertFalse(W < S)
+
+        self.assertFalse(N < N)
+        self.assertFalse(S < S)
+        self.assertFalse(W < W)
+        self.assertFalse(E < E)
+
+    def test_le(self):
+        self.assertTrue(S <= N)
+        self.assertTrue(W <= N)
+        self.assertTrue(E <= N)
+        self.assertTrue(S <= E)
+        self.assertTrue(W <= E)
+        self.assertTrue(S <= W)
+
+        self.assertFalse(N <= W)
+        self.assertFalse(N <= S)
+        self.assertFalse(N <= E)
+        self.assertFalse(E <= W)
+        self.assertFalse(E <= S)
+        self.assertFalse(W <= S)
+
+        self.assertTrue(N <= N)
+        self.assertTrue(S <= S)
+        self.assertTrue(W <= W)
+        self.assertTrue(E <= E)
+
+    def test_gt(self):
+        self.assertTrue(N > S)
+        self.assertTrue(N > W)
+        self.assertTrue(N > E)
+        self.assertTrue(E > S)
+        self.assertTrue(E > W)
+        self.assertTrue(W > S)
+
+        self.assertFalse(W > N)
+        self.assertFalse(S > N)
+        self.assertFalse(E > N)
+        self.assertFalse(W > E)
+        self.assertFalse(S > E)
+        self.assertFalse(S > W)
+
+        self.assertFalse(N > N)
+        self.assertFalse(S > S)
+        self.assertFalse(W > W)
+        self.assertFalse(E > E)
+
+    def test_gt(self):
+        self.assertTrue(N >= S)
+        self.assertTrue(N >= W)
+        self.assertTrue(N >= E)
+        self.assertTrue(E >= S)
+        self.assertTrue(E >= W)
+        self.assertTrue(W >= S)
+
+        self.assertFalse(W >= N)
+        self.assertFalse(S >= N)
+        self.assertFalse(E >= N)
+        self.assertFalse(W >= E)
+        self.assertFalse(S >= E)
+        self.assertFalse(S >= W)
+
+        self.assertTrue(N >= N)
+        self.assertTrue(S >= S)
+        self.assertTrue(W >= W)
+        self.assertTrue(E >= E)

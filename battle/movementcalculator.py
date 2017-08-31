@@ -20,14 +20,14 @@ class MovementCalculator(object):
         edges = {start}
         mv_pts_and_path = {start: (0, [])}
 
-        while _any_edge_values_le_max_mv(edges, mv_pts_and_path, max_mv):
+        while _any_edge_values_le_max_mv(edges, mv_pts_and_path, (max_mv, [])):
             temp_edges = set()
             for edge in edges:
                 mv_pts_and_path, new_edges = self._get_updated_pts_and_dir_and_new_edges(edge, max_mv, mv_pts_and_path)
                 temp_edges.update(new_edges)
             edges = temp_edges.copy()
 
-        return _remove_values_above_cutoff(mv_pts_and_path, max_mv)
+        return _remove_values_above_cutoff_pts_path_dict(mv_pts_and_path, max_mv)
 
     def get_movement_points(self, start: Point, max_mv: int) -> Dict[Point, int]:
         edges = {start}
@@ -49,10 +49,13 @@ class MovementCalculator(object):
         if pts_from_origin < max_mv:
             for new_direction in Direction:
                 possible_edge = edge.in_direction(new_direction)
-                mv_pts = self._get_mv_pts(edge, possible_edge) + pts_from_origin
-                if possible_edge not in mv_pts_update or mv_pts < mv_pts_update[possible_edge][0]:
+                possible_pts = self._get_mv_pts(edge, possible_edge) + pts_from_origin
+                possible_path = path_from_origin[:]
+                possible_path.append(new_direction)
+                if possible_edge not in mv_pts_update or (possible_pts, possible_path) < mv_pts_update[possible_edge]:
                     new_edges.add(possible_edge)
-                    mv_pts_update[possible_edge] = (mv_pts, path_from_origin[:].append(new_direction))
+
+                    mv_pts_update[possible_edge] = (possible_pts, possible_path)
         return mv_pts_update, new_edges
 
     def _get_updated_mv_pts_and_new_edges(self, edge, max_mv, movement_points):
@@ -80,3 +83,7 @@ def _any_edge_values_le_max_mv(edges, mv_pts_dict, max_mv):
 
 def _remove_values_above_cutoff(dictionary, cutoff):
     return {point: mv_pts for point, mv_pts in dictionary.items() if mv_pts <= cutoff}
+
+
+def _remove_values_above_cutoff_pts_path_dict(dictionary, cutoff):
+    return {point: pts_path for point, pts_path in dictionary.items() if pts_path[0] <= cutoff}
