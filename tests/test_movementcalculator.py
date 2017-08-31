@@ -498,10 +498,12 @@ class TestMovementCalculator(unittest.TestCase):
         tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
         map_ = Map(4, 4, tiles)
         origin = Point(1, 0)
-        expected_six = {Point(0, 0): (1, [W]),       Point(1, 0): (0, []),           Point(2, 0): (1, [E]),       Point(3, 0): (2, [E, E]),
-                        Point(0, 1): (2, [W, N]),    Point(1, 1): (4, [N]),          Point(2, 1): (2, [E, N]),    Point(3, 1): (3, [E, E, N]),
-                        Point(0, 2): (3, [W, N, N]), Point(1, 2): (4, [W, N, N, E]), Point(2, 2): (3, [E, N, N]), Point(3, 2): (4, [E, E, N, N]),
-                                                     Point(1, 3): (5, [W, N, N, E, N]),                           Point(3, 3): (5, [E, E, N, N, N])}
+        expected_six = {
+            Point(0, 0): (1, [W]),       Point(1, 0): (0, []),           Point(2, 0): (1, [E]),       Point(3, 0): (2, [E, E]),
+            Point(0, 1): (2, [W, N]),    Point(1, 1): (4, [N]),          Point(2, 1): (2, [E, N]),    Point(3, 1): (3, [E, E, N]),
+            Point(0, 2): (3, [W, N, N]), Point(1, 2): (4, [W, N, N, E]), Point(2, 2): (3, [E, N, N]), Point(3, 2): (4, [E, E, N, N]),
+                                         Point(1, 3): (5, [W, N, N, E, N]),                           Point(3, 3): (5, [E, E, N, N, N])
+        }
 
         ranger = MovementCalculator(map_)
         self.assertEqual(ranger.get_movement_points_with_path(origin, 6), expected_six)
@@ -551,9 +553,9 @@ class TestMovementCalculator(unittest.TestCase):
         origin = Point(1, 3)
         expected_six = {
             Point(0, 0): (4, [W, S, S, S]), Point(1, 0): (5, [W, S, S, S, E]), Point(2, 0): (6, [W, S, S, S, E, E]),
-            Point(0, 1): (3, [W, S, S]),    Point(1, 1): (4, [W, S, S, E]),    Point(2, 1): (5, [W, S, S, E, E]), Point(3, 1): (6, [W, S, S, E, E, E]),
+            Point(0, 1): (3, [W, S, S]),    Point(1, 1): (4, [W, S, S, E]),    Point(2, 1): (5, [W, S, S, E, E]),   Point(3, 1): (6, [W, S, S, E, E, E]),
             Point(0, 2): (2, [W, S]),       Point(1, 2): (1, [S]),             Point(2, 2): (5, [S, E]),
-            Point(0, 3): (1, [W]),          Point(1, 3): (0, []),              Point(2, 3): (1, [E]),             Point(3, 3): (6, [E, E])
+            Point(0, 3): (1, [W]),          Point(1, 3): (0, []),              Point(2, 3): (1, [E]),               Point(3, 3): (6, [E, E])
         }
 
         ranger = MovementCalculator(map_)

@@ -134,7 +134,7 @@ class TestDirection(unittest.TestCase):
         self.assertFalse(W > W)
         self.assertFalse(E > E)
 
-    def test_gt(self):
+    def test_ge(self):
         self.assertTrue(N >= S)
         self.assertTrue(N >= W)
         self.assertTrue(N >= E)
