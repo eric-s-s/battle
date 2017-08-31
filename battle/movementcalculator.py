@@ -18,57 +18,62 @@ class MovementCalculator(object):
         {Point: (distance, [directions from origin]}
         """
         edges = {start}
-        mv_pts_and_path = {start: (0, [])}
+        start_movement_values = {start: (0, [])}
+        max_val = (max_mv, [Direction.N] * self._map.get_size()[0])
 
-        while _any_edge_values_le_max_mv(edges, mv_pts_and_path, (max_mv, [])):
-            temp_edges = set()
-            for edge in edges:
-                mv_pts_and_path, new_edges = self._get_updated_pts_and_dir_and_new_edges(edge, max_mv, mv_pts_and_path)
-                temp_edges.update(new_edges)
-            edges = temp_edges.copy()
+        raw_movement_values = self._create_raw_movement_values(edges, max_val, start_movement_values)
 
-        return _remove_values_above_cutoff_pts_path_dict(mv_pts_and_path, max_mv)
+        return _remove_values_above_cutoff(raw_movement_values, max_val)
 
     def get_movement_points(self, start: Point, max_mv: int) -> Dict[Point, int]:
         edges = {start}
-        movement_points = {start: 0}
+        start_movement_values = {start: 0}
+        max_val = max_mv
 
-        while _any_edge_values_le_max_mv(edges, movement_points, max_mv):
+        raw_movement_values = self._create_raw_movement_values(edges, max_val, start_movement_values)
+
+        return _remove_values_above_cutoff(raw_movement_values, max_val)
+
+    def _create_raw_movement_values(self, edges_to_investigate, max_val, movement_values):
+        new_movement_values = movement_values.copy()
+        while _any_edge_values_le_max(edges_to_investigate, new_movement_values, max_val):
             temp_edges = set()
-            for edge in edges:
-                movement_points, new_edges = self._get_updated_mv_pts_and_new_edges(edge, max_mv, movement_points)
+            for edge in edges_to_investigate:
+                new_movement_values, new_edges = self._get_updated_mv_values_and_new_edges(edge, max_val, new_movement_values)
                 temp_edges.update(new_edges)
-            edges = temp_edges.copy()
+            edges_to_investigate = temp_edges.copy()
+        return new_movement_values
 
-        return _remove_values_above_cutoff(movement_points, max_mv)
-
-    def _get_updated_pts_and_dir_and_new_edges(self, edge, max_mv, mv_pts_and_path):
+    def _get_updated_mv_values_and_new_edges(self, edge, max_val, move_values):
         new_edges = set()
-        mv_pts_update = mv_pts_and_path.copy()
-        pts_from_origin, path_from_origin = mv_pts_update[edge]
-        if pts_from_origin < max_mv:
-            for new_direction in Direction:
-                possible_edge = edge.in_direction(new_direction)
-                possible_pts = self._get_mv_pts(edge, possible_edge) + pts_from_origin
-                possible_path = path_from_origin[:]
-                possible_path.append(new_direction)
-                if possible_edge not in mv_pts_update or (possible_pts, possible_path) < mv_pts_update[possible_edge]:
-                    new_edges.add(possible_edge)
+        updated_mv_values = move_values.copy()
+        base_move_value = updated_mv_values[edge]
+        if base_move_value < max_val:
+            for direction in Direction:
 
-                    mv_pts_update[possible_edge] = (possible_pts, possible_path)
-        return mv_pts_update, new_edges
+                if isinstance(max_val, tuple):
+                    new_edge, new_move_val = self._get_candidates_with_path(base_move_value, edge, direction)
+                else:
+                    new_edge, new_move_val = self._get_candidates_without_path(base_move_value, edge, direction)
 
-    def _get_updated_mv_pts_and_new_edges(self, edge, max_mv, movement_points):
-        new_edges = set()
-        mv_pts_update = movement_points.copy()
-        edge_to_start = mv_pts_update[edge]
-        if edge_to_start < max_mv:
-            for possible_edge in edge.at_distance(1):
-                mv_pts = self._get_mv_pts(edge, possible_edge) + edge_to_start
-                if possible_edge not in mv_pts_update or mv_pts < mv_pts_update[possible_edge]:
-                    new_edges.add(possible_edge)
-                    mv_pts_update[possible_edge] = mv_pts
-        return mv_pts_update, new_edges
+                if new_edge not in updated_mv_values or new_move_val < updated_mv_values[new_edge]:
+                    new_edges.add(new_edge)
+                    updated_mv_values[new_edge] = new_move_val
+
+        return updated_mv_values, new_edges
+
+    def _get_candidates_with_path(self, base_move_value, edge, direction):
+        candidate_edge = edge.in_direction(direction)
+        move_pts = self._get_mv_pts(edge, candidate_edge) + base_move_value[0]
+        path = base_move_value[1][:]
+        path.append(direction)
+        candidate_move_value = (move_pts, path)
+        return candidate_edge, candidate_move_value
+
+    def _get_candidates_without_path(self, base_move_value, edge, direction):
+        candidate_edge = edge.in_direction(direction)
+        candidate_move_value = self._get_mv_pts(edge, candidate_edge) + base_move_value
+        return candidate_edge, candidate_move_value
 
     def _get_mv_pts(self, start, finish):
         if self._map.can_place_unit(finish):
@@ -77,13 +82,9 @@ class MovementCalculator(object):
             return float('inf')
 
 
-def _any_edge_values_le_max_mv(edges, mv_pts_dict, max_mv):
+def _any_edge_values_le_max(edges, mv_pts_dict, max_mv):
     return any(mv_pts_dict[edge] <= max_mv for edge in edges)
 
 
 def _remove_values_above_cutoff(dictionary, cutoff):
     return {point: mv_pts for point, mv_pts in dictionary.items() if mv_pts <= cutoff}
-
-
-def _remove_values_above_cutoff_pts_path_dict(dictionary, cutoff):
-    return {point: pts_path for point, pts_path in dictionary.items() if pts_path[0] <= cutoff}
