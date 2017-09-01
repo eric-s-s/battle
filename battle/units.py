@@ -1,7 +1,8 @@
 from battle.weapon import Weapon
 
 
-FIST = Weapon(1, 1)
+FIST = Weapon(1, 1, ranged=False)
+GUN = Weapon(5, 5)
 
 
 class Soldier(object):
@@ -13,6 +14,9 @@ class Soldier(object):
         self._healing_pct = heal_pct
 
         self._weapon = FIST
+
+    def get_perimeter_size(self) -> int:
+        return self._weapon.range
 
     def get_move_points(self) -> int:
         return self._current_move

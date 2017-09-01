@@ -1,5 +1,5 @@
 import unittest
-from battle.units import Soldier, FIST
+from battle.units import Soldier, FIST, GUN
 from battle.weapon import Weapon
 
 
@@ -19,6 +19,12 @@ class TestSoldier(unittest.TestCase):
         self.assertEqual(unit.get_health(), 200)
         self.assertEqual(unit.get_move_points(), 5)
         self.assertEqual(unit._healing_pct, 10.0)
+
+    def test_get_perimeter_size(self):
+        unit = Soldier()
+        self.assertEqual(unit.get_perimeter_size(), 1)
+        unit.equip_weapon(GUN)
+        self.assertEqual(unit.get_perimeter_size(), 5)
 
     def test_equip_weapon(self):
         stick = Weapon(3, 2)
