@@ -19,7 +19,7 @@ class MovementCalculator(object):
         """
         edges = {start}
         start_movement_values = {start: (0, [])}
-        max_val = (max_mv, [Direction.N] * self._map.get_size()[0])
+        max_val = (max_mv, [Direction.N] * self._map.get_size()[1])
 
         raw_movement_values = self._create_raw_movement_values(edges, max_val, start_movement_values)
 
