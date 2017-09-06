@@ -583,3 +583,36 @@ class TestMovementCalculator(unittest.TestCase):
             Point(2, 0): (10, [N, N, N, E, E, E, S, S, S, W]),
         }
         self.assertEqual(MovementCalculator(map_).get_movement_points_with_path(origin, 20), expected)
+
+    def test_get_movement_points_with_path_regression_test_two(self):
+        elevations = {Point(0, 0): 0, Point(1, 0): 11, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 11, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 11, Point(2, 2): 0,
+                      Point(0, 3): 0, Point(1, 3): 11, Point(2, 3): 0,
+                      Point(0, 4): 0, Point(1, 4): 0,  Point(2, 4): 0}
+        tiles = [Tile(point=point, elevation=elevation * 10) for point, elevation in elevations.items()]
+        map_ = Map(3, 5, tiles)
+        origin = Point(0, 0)
+        expected = {
+            Point(0, 0): (0,  []),
+            Point(0, 1): (1,  [N]),
+            Point(0, 2): (2,  [N, N]),
+            Point(0, 3): (3,  [N, N, N]),
+            Point(0, 4): (4,  [N, N, N, N]),
+        }
+        self.assertEqual(MovementCalculator(map_).get_movement_points_with_path(origin, 4), expected)
+
+        expected = {
+            Point(0, 0): (0,  []),
+            Point(0, 1): (1,  [N]),
+            Point(0, 2): (2,  [N, N]),
+            Point(0, 3): (3,  [N, N, N]),
+            Point(0, 4): (4,  [N, N, N, N]),
+            Point(1, 4): (5,  [N, N, N, N, E]),
+            Point(2, 4): (6,  [N, N, N, N, E, E]),
+            Point(2, 3): (7,  [N, N, N, N, E, E, S]),
+            Point(2, 2): (8,  [N, N, N, N, E, E, S, S]),
+            Point(2, 1): (9,  [N, N, N, N, E, E, S, S, S]),
+            Point(2, 0): (10, [N, N, N, N, E, E, S, S, S, S]),
+        }
+        self.assertEqual(MovementCalculator(map_).get_movement_points_with_path(origin, 20), expected)
