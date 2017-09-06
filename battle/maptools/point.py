@@ -1,5 +1,5 @@
 from battle.maptools.direction import Direction
-from typing import List, Any
+from typing import List, Any, Generator
 
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
@@ -29,13 +29,13 @@ class Point(object):
     def __lt__(self, other: 'Point'):
         return (self.y, self.x) < (other.y, other.x)
 
-    def __le__(self, other):
+    def __le__(self, other: 'Point'):
         return self == other or self < other
 
-    def __gt__(self, other):
+    def __gt__(self, other: 'Point'):
         return not self <= other
 
-    def __ge__(self, other):
+    def __ge__(self, other: 'Point'):
         return not self < other
 
     def __repr__(self):
@@ -73,6 +73,16 @@ class Point(object):
             for del_y in y_range:
                 out.append(self.plus(del_x, del_y))
         return sorted(out)
+
+    def generate_path(self, path: List[Direction]) -> Generator['Point', None, None]:
+
+        def path_generator(start, path_):
+            current = start
+            for direction in path_:
+                current = current.in_direction(direction)
+                yield current
+
+        return path_generator(self, path)
 
 
 def get_range(stop_by):

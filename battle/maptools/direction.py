@@ -21,3 +21,16 @@ class Direction(Enum):
 
     def __repr__(self):
         return 'Direction.{}'.format(self.name)
+
+    def __lt__(self, other: 'Direction'):
+        return (self.value[1], self.value[0]) < (other.value[1], other.value[0])
+
+    def __le__(self, other: 'Direction'):
+        return self < other or self == other
+
+    def __gt__(self, other: 'Direction'):
+        return not self <= other
+
+    def __ge__(self, other: 'Direction'):
+        return not self < other
+

@@ -9,3 +9,4 @@ from battle.movement_tracker import MovementTracker
 from battle.rangefinder import RangeFinder
 from battle.units import Soldier
 from battle.weapon import Weapon
+from battle.movementcalculator import MovementCalculator

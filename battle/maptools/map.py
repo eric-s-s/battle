@@ -9,8 +9,8 @@ N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 
 
 class MapPlacementError(ValueError):
-    def __init__(self, *args, **kwargs):
-        super(MapPlacementError, self).__init__(*args, **kwargs)
+    def __init__(self, *args):
+        super(MapPlacementError, self).__init__(*args)
 
 
 class Map(object):
