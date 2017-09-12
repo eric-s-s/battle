@@ -9,12 +9,14 @@ class PerimeterListener(object):
         self._map = map_
         self._range_finder = RangeFinder(self._map)
         map_pts = Point(0, 0).to_rectangle(*self._map.get_size())
-        self._watchers_at_point = dict.fromkeys(map_pts, set())
+        self._watchers_at_point = {pt: set() for pt in map_pts}
 
     def set_perimeter(self, unit: Soldier, point: Point):
         range_dict = self._get_range_dict(unit, point)
-        for point in range_dict.keys():
-            self._watchers_at_point[point].add(unit)
+        del range_dict[0]
+        for pt_advantage_list in range_dict.values():
+            for pair in pt_advantage_list:
+                self._watchers_at_point[pair[0]].add(unit)
 
     def _get_range_dict(self, unit, point):
         max_range = unit.get_perimeter_size()

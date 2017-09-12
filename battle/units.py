@@ -1,8 +1,8 @@
-from battle.weapon import Weapon
+from battle.weapon import MeleeWeapon, RangedWeapon, Weapon
 
 
-FIST = Weapon(1, 1, ranged=False)
-GUN = Weapon(5, 5)
+FIST = MeleeWeapon(dmg=1, action_pts=1)
+GUN = RangedWeapon(dmg=5, action_pts=2, range_=5, max_ammo=10)
 
 
 class Soldier(object):
@@ -16,7 +16,7 @@ class Soldier(object):
         self._weapon = FIST
 
     def get_perimeter_size(self) -> int:
-        return self._weapon.range
+        return self._weapon.get_stats().range
 
     def get_move_points(self) -> int:
         return self._current_move
@@ -43,7 +43,7 @@ class Soldier(object):
         self._weapon = weapon
 
     def attack(self, opponent):
-        dmg = self._weapon.atk_dmg
+        dmg = self._weapon.use_weapon()
         opponent.receive_dmg(dmg)
 
     def is_dead(self) -> bool:

@@ -1,6 +1,6 @@
 import unittest
 from battle.units import Soldier, FIST, GUN
-from battle.weapon import Weapon
+from battle.weapon import MeleeWeapon
 
 
 class TestSoldier(unittest.TestCase):
@@ -27,7 +27,7 @@ class TestSoldier(unittest.TestCase):
         self.assertEqual(unit.get_perimeter_size(), 5)
 
     def test_equip_weapon(self):
-        stick = Weapon(3, 2)
+        stick = MeleeWeapon(3, 2)
         self.soldier.equip_weapon(stick)
         self.assertEqual(self.soldier.get_weapon(), stick)
 
@@ -46,7 +46,7 @@ class TestSoldier(unittest.TestCase):
 
     def test_attack(self):
         opponent = Soldier()
-        self.assertEqual(self.soldier.get_weapon().atk_dmg, 1)
+        self.assertEqual(self.soldier.get_weapon().get_stats().dmg, 1)
 
         self.soldier.attack(opponent)
         self.assertEqual(opponent.get_health(), 99)
@@ -56,8 +56,9 @@ class TestSoldier(unittest.TestCase):
 
     def test_attack_with_different_weapon(self):
         opponent = Soldier()
-        self.soldier.equip_weapon(Weapon(10, 1))
-        self.assertEqual(self.soldier.get_weapon().atk_dmg, 10)
+        new_weapon = MeleeWeapon(10, 1)
+        self.soldier.equip_weapon(new_weapon)
+        self.assertEqual(self.soldier.get_weapon().get_stats().dmg, 10)
 
         self.soldier.attack(opponent)
         self.assertEqual(opponent.get_health(), 90)
