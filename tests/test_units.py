@@ -69,13 +69,13 @@ class TestSoldier(unittest.TestCase):
     def test_attack_uses_ammo_and_action_points(self):
         opponent = Soldier()
         self.soldier.equip_weapon(GUN)
-        self.assertEqual(self.soldier.get_weapon().current_ammo, 10)
+        self.assertEqual(self.soldier.get_weapon().stats.current_ammo, 10)
         self.assertEqual(self.soldier.get_weapon().stats.action_pts, 2)
         self.assertEqual(self.soldier.get_action_points(), 3)
 
         self.soldier.attack(opponent)
 
-        self.assertEqual(self.soldier.get_weapon().current_ammo, 9)
+        self.assertEqual(self.soldier.get_weapon().stats.current_ammo, 9)
         self.assertEqual(self.soldier.get_action_points(), 1)
 
     # TODO test attack losing ammo, test attack out of ammo, test attack uses action points

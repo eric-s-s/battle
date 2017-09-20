@@ -1,8 +1,8 @@
-from collections import namedtuple
-from typing import Union
+from battle.statstools.basestats import stats_factory
 
-
-WeaponStats = namedtuple('WeaponStats', 'dmg, action_pts, range, ammo')
+# WeaponStats = namedtuple('WeaponStats', 'dmg, action_pts, range, ammo')
+WeaponStats = stats_factory('WeaponStats', ('dmg', None, False), ('action_pts', None, False), ('range', None, False),
+                            ('ammo', None, True))
 
 
 class OutOfAmmo(StopIteration):
@@ -12,7 +12,6 @@ class OutOfAmmo(StopIteration):
 class Weapon(object):
     def __init__(self, stats: WeaponStats) -> None:
 
-        self._current_ammo = stats.ammo
         self._stats = stats
 
     @staticmethod
@@ -24,18 +23,14 @@ class Weapon(object):
     def stats(self):
         return self._stats
 
-    @property
-    def current_ammo(self):
-        return self._current_ammo
-
     def use_weapon(self):
-        if self._current_ammo <= 0:
+        if self._stats.current_ammo <= 0:
             raise OutOfAmmo()
-        self._current_ammo -= 1
+        self._stats.current_ammo -= 1
         return self._stats.dmg
 
     def refill_ammo(self):
-        self._current_ammo = self._stats.ammo
+        self._stats.current_ammo = self._stats.ammo
 
 
 class MeleeWeapon(Weapon):

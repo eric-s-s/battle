@@ -31,7 +31,7 @@ class TestWeapon(unittest.TestCase):
     def test_use_weapon_non_inf_ammo(self):
         self.assertEqual(self.ranged.stats.ammo, 5)
         self.assertEqual(self.ranged.use_weapon(), 3)
-        self.assertEqual(self.ranged.current_ammo, 4)
+        self.assertEqual(self.ranged.stats.current_ammo, 4)
 
     def test_use_weapon_no_ammo(self):
         for _ in range(5):

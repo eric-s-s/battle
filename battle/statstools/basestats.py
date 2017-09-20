@@ -1,7 +1,29 @@
 from functools import partial
-from typing import Tuple, Any, List
+from typing import Tuple, Any
 
 ParamsTuple = Tuple[str, Any, bool]
+
+
+class BaseStats(object):
+    def __eq__(self, other):
+        if not isinstance(other, BaseStats):
+            return False
+        return self.__class__.__name__ == other.__class__.__name__ and self.__dict__ == other.__dict__
+
+    def update(self, state, new_val):
+        private_attr = '_{}'.format(state)
+        current_attr = 'current_{}'.format(state)
+        if private_attr not in self.__dict__:
+            raise AttributeError('No state: {}'.format(state))
+
+        new_dict = self.__dict__.copy()
+        new_dict[private_attr] = new_val
+        if current_attr in new_dict:
+            new_dict[current_attr] = new_val
+
+        new_obj = self.__class__.__new__(self.__class__)
+        new_obj.__dict__ = new_dict
+        return new_obj
 
 
 def stats_factory(class_name: str, *params_tuples: ParamsTuple):
@@ -44,20 +66,4 @@ def stats_factory(class_name: str, *params_tuples: ParamsTuple):
 
     class_dict['__init__'] = __init__
 
-    def __eq__(self, other):
-        if type(self) is not type(other):
-            return False
-        return all(self.__dict__[key] == other.__dict__[key] for key in self.__dict__)
-
-    class_dict['__eq__'] = __eq__
-
-    def update(self, state, new_val):
-        new_dict = self.__dict__.copy()
-        new_dict['_{}'.format(state)] = new_val
-        new_obj = self.__class__.__new__(self.__class__)
-        new_obj.__dict__ = new_dict
-        return new_obj
-
-    class_dict['update'] = update
-
-    return type(class_name, (object,), class_dict)
+    return type(class_name, (BaseStats,), class_dict)
