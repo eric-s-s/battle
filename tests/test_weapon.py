@@ -13,16 +13,6 @@ class TestWeapon(unittest.TestCase):
         new = Weapon(stats)
         self.assertEqual(new.stats, stats)
 
-    # def test_init_with_bad_negative_values(self):
-    #     self.assertRaises(ValueError, Weapon, -1, 1, 1, 1, True)
-    #     self.assertRaises(ValueError, Weapon, 1, -1, 1, 1, True)
-    #     self.assertRaises(ValueError, Weapon, 1, 1, -1, 1, True)
-    #
-    # def test_init_with_bad_zero_values(self):
-    #     self.assertRaises(ValueError, Weapon, 0, 1, 1, 1, True)
-    #     self.assertRaises(ValueError, Weapon, 1, 0, 1, 1, True)
-    #     self.assertRaises(ValueError, Weapon, 1, 1, 0, 1, True)
-
     def test_use_weapon_inf_ammo(self):
         dmg = self.melee.use_weapon()
         self.assertEqual(dmg, 4)

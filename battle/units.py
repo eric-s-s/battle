@@ -1,4 +1,4 @@
-from battle.weapon import MeleeWeapon, RangedWeapon, Weapon
+from battle.weapon import MeleeWeapon, RangedWeapon, Weapon, OutOfAmmo
 
 
 FIST = MeleeWeapon(dmg=1, action_pts=1)
@@ -21,13 +21,13 @@ class Soldier(object):
     def get_action_points(self) -> int:
         return self._current_action_pts
 
-    def can_move(self, mv_pts) -> bool:
-        return mv_pts <= self._current_action_pts and not self.is_dead()
+    def can_act(self, action_pts) -> bool:
+        return action_pts <= self._current_action_pts and not self.is_dead()
 
     def move(self, mv_pts):
         if mv_pts < 0:
             raise ValueError('mv_pts can\'t be less than zero')
-        if self.can_move(mv_pts):
+        if self.can_act(mv_pts):
             self._current_action_pts -= mv_pts
 
     def reset_move_points(self):
@@ -44,11 +44,14 @@ class Soldier(object):
 
     def attack(self, opponent):
         action_pts = self._weapon.stats.action_pts
-        if self._current_action_pts < action_pts:
+        if not self.can_act(action_pts):
             return None
         self._current_action_pts -= action_pts
-        dmg = self._weapon.use_weapon()
-        opponent.receive_dmg(dmg)
+        try:
+            dmg = self._weapon.use_weapon()
+            opponent.receive_dmg(dmg)
+        except OutOfAmmo:
+            self._weapon.refill_ammo()
 
     def is_dead(self) -> bool:
         return self._current_health <= 0

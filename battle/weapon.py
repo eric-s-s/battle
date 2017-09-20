@@ -1,6 +1,5 @@
 from battle.statstools.basestats import stats_factory
 
-# WeaponStats = namedtuple('WeaponStats', 'dmg, action_pts, range, ammo')
 WeaponStats = stats_factory('WeaponStats', ('dmg', None, False), ('action_pts', None, False), ('range', None, False),
                             ('ammo', None, True))
 
@@ -13,11 +12,6 @@ class Weapon(object):
     def __init__(self, stats: WeaponStats) -> None:
 
         self._stats = stats
-
-    @staticmethod
-    def _raise_error_for_bad_input(atk_dmg, action_pts, range_):
-        if atk_dmg <= 0 or action_pts <= 0 or range_ <= 0:
-            raise ValueError('dmg, action_pts and range_ must be grater than zero.')
 
     @property
     def stats(self):
@@ -43,5 +37,3 @@ class RangedWeapon(Weapon):
     def __init__(self, dmg, action_pts, range_, ammo):
         stats = WeaponStats(dmg, action_pts, range_, ammo)
         super(RangedWeapon, self).__init__(stats)
-
-

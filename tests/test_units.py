@@ -78,7 +78,23 @@ class TestSoldier(unittest.TestCase):
         self.assertEqual(self.soldier.get_weapon().stats.current_ammo, 9)
         self.assertEqual(self.soldier.get_action_points(), 1)
 
-    # TODO test attack losing ammo, test attack out of ammo, test attack uses action points
+    def test_attack_out_of_ammo_reloads_and_uses_action_points(self):
+        soldier = Soldier(max_action_pts=10)
+        weapon = MeleeWeapon(5, 1, 1, 2)
+        soldier.equip_weapon(weapon)
+
+        for _ in range(2):
+            soldier.attack(self.soldier)
+
+        self.assertEqual(weapon.stats.current_ammo, 0)
+        self.assertEqual(self.soldier.get_health(), 90)
+        self.assertEqual(soldier.get_action_points(), 8)
+
+        soldier.attack(self.soldier)
+
+        self.assertEqual(weapon.stats.current_ammo, 2)
+        self.assertEqual(self.soldier.get_health(), 90)
+        self.assertEqual(soldier.get_action_points(), 7)
 
     def test_is_dead_true(self):
         self.soldier.receive_dmg(self.soldier.get_health())
@@ -117,14 +133,14 @@ class TestSoldier(unittest.TestCase):
     def test_heal_neg_health(self):
         self.assertRaises(ValueError, self.soldier.heal, -1)
 
-    def test_can_move(self):
-        self.assertTrue(self.soldier.can_move(3))
-        self.assertTrue(self.soldier.can_move(0))
-        self.assertFalse(self.soldier.can_move(4))
+    def test_can_act(self):
+        self.assertTrue(self.soldier.can_act(3))
+        self.assertTrue(self.soldier.can_act(0))
+        self.assertFalse(self.soldier.can_act(4))
 
-    def test_can_move_dead(self):
+    def test_can_act_dead(self):
         self.soldier.receive_dmg(1000)
-        self.assertFalse(self.soldier.can_move(0))
+        self.assertFalse(self.soldier.can_act(0))
 
     def test_move(self):
         self.soldier.move(2)
