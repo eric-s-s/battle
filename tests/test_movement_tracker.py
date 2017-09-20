@@ -84,14 +84,14 @@ class TestMovementTracker(unittest.TestCase):
         self.assertEqual(self.mover.get_point(self.soldier), Point(0, 1))
         self.assertEqual(self.test_map.get_unit(Point(0, 1)), self.soldier)
         self.assertIsNone(self.test_map.get_unit(Point(0, 0)))
-        self.assertEqual(self.soldier.get_move_points(), 2)
+        self.assertEqual(self.soldier.get_action_points(), 2)
 
     def test_move_false(self):
         self.mover.set_point(self.soldier, Point(0, 0))
         self.assertFalse(self.mover.move(self.soldier, Direction.S))
         self.assertEqual(self.mover.get_point(self.soldier), Point(0, 0))
         self.assertEqual(self.test_map.get_unit(Point(0, 0)), self.soldier)
-        self.assertEqual(self.soldier.get_move_points(), 3)
+        self.assertEqual(self.soldier.get_action_points(), 3)
 
     def test_move_unit_not_on_map(self):
         unit = Soldier()

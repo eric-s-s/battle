@@ -2,6 +2,7 @@ from battle.rangefinder import RangeFinder
 from battle.maptools.map import Map
 from battle.maptools.point import Point
 from battle.units import Soldier
+from battle.weapon import RangedWeapon
 
 
 class PerimeterListener(object):
@@ -20,7 +21,7 @@ class PerimeterListener(object):
 
     def _get_range_dict(self, unit, point):
         max_range = unit.get_perimeter_size()
-        if unit.get_weapon().is_ranged:
+        if isinstance(unit.get_weapon(), RangedWeapon):
             range_dict = self._range_finder.get_attack_ranges_ranged(point, max_range)
         else:
             range_dict = self._range_finder.get_attack_ranges_melee(point, max_range)

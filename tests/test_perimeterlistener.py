@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from battle.weapon import RangedWeapon
+from battle.weapon import RangedWeapon, MeleeWeapon
 from battle.units import Soldier, FIST
 from battle.perimiterlistener import PerimeterListener
 from battle.rangefinder import RangeFinder
@@ -19,11 +19,11 @@ class TestPerimeterListener(TestCase):
         self.ranged.equip_weapon(self.gun)
 
     def test_set_up(self):
-        self.assertEqual(self.gun.get_stats().range, 2)
-        self.assertTrue(self.gun.is_ranged)
+        self.assertEqual(self.gun.stats.range, 2)
+        self.assertIsInstance(self.gun, RangedWeapon)
 
-        self.assertEqual(FIST.get_stats().range, 1)
-        self.assertFalse(FIST.is_ranged)
+        self.assertEqual(FIST.stats.range, 1)
+        self.assertIsInstance(FIST, MeleeWeapon)
 
         self.assertEqual(self.melee.get_weapon(), FIST)
         self.assertEqual(self.melee.get_perimeter_size(), 1)
