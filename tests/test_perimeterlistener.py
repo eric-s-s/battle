@@ -19,10 +19,10 @@ class TestPerimeterListener(TestCase):
         self.ranged.equip_weapon(self.gun)
 
     def test_set_up(self):
-        self.assertEqual(self.gun.stats.range, 2)
+        self.assertEqual(self.gun.range, 2)
         self.assertIsInstance(self.gun, RangedWeapon)
 
-        self.assertEqual(FIST.stats.range, 1)
+        self.assertEqual(FIST.range, 1)
         self.assertIsInstance(FIST, MeleeWeapon)
 
         self.assertEqual(self.melee.get_weapon(), FIST)

@@ -1,7 +1,5 @@
-from battle.statstools.basestats import stats_factory
-
-WeaponStats = stats_factory('WeaponStats', ('dmg', None, False), ('action_pts', None, False), ('range', None, False),
-                            ('ammo', None, True))
+from typing import Union
+from battle.statstools.stat import PositiveStat
 
 
 class OutOfAmmo(StopIteration):
@@ -9,31 +7,48 @@ class OutOfAmmo(StopIteration):
 
 
 class Weapon(object):
-    def __init__(self, stats: WeaponStats) -> None:
+    def __init__(self, dmg: int, action_pts: int, range_: int, ammo: Union[int, float]) -> None:
 
-        self._stats = stats
+        self._dmg = PositiveStat(dmg)
+        self._action = PositiveStat(action_pts)
+        self._range = PositiveStat(range_)
+        self._ammo = PositiveStat(ammo)
 
     @property
-    def stats(self):
-        return self._stats
+    def dmg(self):
+        return self._dmg.max
+
+    @property
+    def action_pts(self):
+        return self._action.max
+
+    @property
+    def range(self):
+        return self._range.max
+
+    @property
+    def ammo(self):
+        return self._ammo.current
+
+    @property
+    def max_ammo(self):
+        return self._ammo.max
 
     def use_weapon(self):
-        if self._stats.current_ammo <= 0:
+        if self.ammo <= 0:
             raise OutOfAmmo()
-        self._stats.current_ammo -= 1
-        return self._stats.dmg
+        self._ammo.modify_current(-1)
+        return self.dmg
 
     def refill_ammo(self):
-        self._stats.current_ammo = self._stats.ammo
+        self._ammo.reset()
 
 
 class MeleeWeapon(Weapon):
     def __init__(self, dmg, action_pts, range_=1, ammo=float('inf')):
-        stats = WeaponStats(dmg, action_pts, range_, ammo)
-        super(MeleeWeapon, self).__init__(stats)
+        super(MeleeWeapon, self).__init__(dmg, action_pts, range_, ammo)
 
 
 class RangedWeapon(Weapon):
     def __init__(self, dmg, action_pts, range_, ammo):
-        stats = WeaponStats(dmg, action_pts, range_, ammo)
-        super(RangedWeapon, self).__init__(stats)
+        super(RangedWeapon, self).__init__(dmg, action_pts, range_, ammo)

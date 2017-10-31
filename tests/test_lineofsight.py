@@ -49,8 +49,6 @@ class TestLineOfSight(unittest.TestCase):
         slope = get_slope(point_1, point_2)
         self.assertEqual(slope, 0)
 
-
-
     def test_is_obstacle_higher_than_start_y_axis_pos_direction_true(self):
         elevations = {Point(0, 0): 0, Point(1, 0): 2, Point(2, 0): 0,
                       Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
@@ -357,6 +355,7 @@ class TestLineOfSight(unittest.TestCase):
         self.assertFalse(sighting_tool.can_sight_target(target, shooter_miss_2))
         self.assertTrue(sighting_tool.can_sight_target(target, shooter_hit_1))
         self.assertTrue(sighting_tool.can_sight_target(target, shooter_hit_2))
+
 
 if __name__ == '__main__':
     unittest.main()

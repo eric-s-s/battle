@@ -36,17 +36,17 @@ class TestSoldier(unittest.TestCase):
         self.assertEqual(self.soldier.get_health(), 1)
 
         self.soldier.receive_dmg(2)
-        self.assertEqual(self.soldier.get_health(), -1)
+        self.assertEqual(self.soldier.get_health(), 0)
 
         self.soldier.receive_dmg(0)
-        self.assertEqual(self.soldier.get_health(), -1)
+        self.assertEqual(self.soldier.get_health(), 0)
 
     def test_receive_dmg_negative_number_raises_value_error(self):
         self.assertRaises(ValueError, self.soldier.receive_dmg, -10)
 
     def test_attack(self):
         opponent = Soldier()
-        self.assertEqual(self.soldier.get_weapon().stats.dmg, 1)
+        self.assertEqual(self.soldier.get_weapon().dmg, 1)
 
         self.soldier.attack(opponent)
         self.assertEqual(opponent.get_health(), 99)
@@ -58,7 +58,7 @@ class TestSoldier(unittest.TestCase):
         opponent = Soldier()
         new_weapon = MeleeWeapon(10, 1)
         self.soldier.equip_weapon(new_weapon)
-        self.assertEqual(self.soldier.get_weapon().stats.dmg, 10)
+        self.assertEqual(self.soldier.get_weapon().dmg, 10)
 
         self.soldier.attack(opponent)
         self.assertEqual(opponent.get_health(), 90)
@@ -69,30 +69,30 @@ class TestSoldier(unittest.TestCase):
     def test_attack_uses_ammo_and_action_points(self):
         opponent = Soldier()
         self.soldier.equip_weapon(GUN)
-        self.assertEqual(self.soldier.get_weapon().stats.current_ammo, 10)
-        self.assertEqual(self.soldier.get_weapon().stats.action_pts, 2)
+        self.assertEqual(self.soldier.get_weapon().ammo, 10)
+        self.assertEqual(self.soldier.get_weapon().action_pts, 2)
         self.assertEqual(self.soldier.get_action_points(), 3)
 
         self.soldier.attack(opponent)
 
-        self.assertEqual(self.soldier.get_weapon().stats.current_ammo, 9)
+        self.assertEqual(self.soldier.get_weapon().ammo, 9)
         self.assertEqual(self.soldier.get_action_points(), 1)
 
     def test_attack_out_of_ammo_reloads_and_uses_action_points(self):
-        soldier = Soldier(max_action_pts=10)
+        soldier = Soldier(action_pts=10)
         weapon = MeleeWeapon(5, 1, 1, 2)
         soldier.equip_weapon(weapon)
 
         for _ in range(2):
             soldier.attack(self.soldier)
 
-        self.assertEqual(weapon.stats.current_ammo, 0)
+        self.assertEqual(weapon.ammo, 0)
         self.assertEqual(self.soldier.get_health(), 90)
         self.assertEqual(soldier.get_action_points(), 8)
 
         soldier.attack(self.soldier)
 
-        self.assertEqual(weapon.stats.current_ammo, 2)
+        self.assertEqual(weapon.ammo, 2)
         self.assertEqual(self.soldier.get_health(), 90)
         self.assertEqual(soldier.get_action_points(), 7)
 
@@ -128,7 +128,7 @@ class TestSoldier(unittest.TestCase):
     def test_heal_dead_person(self):
         self.soldier.receive_dmg(120)
         self.soldier.heal(100)
-        self.assertEqual(self.soldier.get_health(), -20)
+        self.assertEqual(self.soldier.get_health(), 0)
 
     def test_heal_neg_health(self):
         self.assertRaises(ValueError, self.soldier.heal, -1)
@@ -164,7 +164,7 @@ class TestSoldier(unittest.TestCase):
         self.soldier.receive_dmg(1000)
         self.soldier.rest()
         self.assertEqual(self.soldier.get_action_points(), 3)
-        self.assertEqual(self.soldier.get_health(), -900)
+        self.assertEqual(self.soldier.get_health(), 0)
 
 
 
