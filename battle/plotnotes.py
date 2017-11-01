@@ -35,4 +35,30 @@ for index, name in enumerate(names):
     pt = pts[index]
     ax.annotate(name, (pt.x, pt.y))
 
+
+scatter = ax.scatter([], [])
+annotations = []
+
+
+# def animate(thing, ann_lst, scatter):
+#     # for el in ann_lst:
+#     #     el.remove()
+#     # sloppy move. it assigns the originally referenced list to empty. basically cheater's global
+#     # done because FuncAnimation is passing the two objects again and again as fargs. They must be mutable. ugh!
+#     # ann_lst[:] = []
+#     while ann_lst:
+#         el = ann_lst.pop()
+#         el.remove()
+#     pts = [(4*random(), 4*random()) for _ in range(5)]
+#     scatter.set_offsets(pts)
+#     for index, xy in enumerate(pts):
+#         ann = ax.annotate(str(index), xy)
+#         ann_lst.append(ann)
+#     return scatter
+#
+#
+# ani = FuncAnimation(fig, animate, fargs=(annotations, scatter), frames=10, interval=500)
+
+
+
 plt.show()
