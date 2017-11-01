@@ -1,38 +1,54 @@
 from typing import Union
+from battle.statstools.stat import PositiveStat
+
+
+class OutOfAmmo(StopIteration):
+    pass
 
 
 class Weapon(object):
-    def __init__(self, atk_dmg: int, range_: int, max_ammo: Union[int, float] = float('inf')):
-        self._raise_error_for_bad_input(atk_dmg, range_)
-        self._atk_dmg = atk_dmg
-        self._range = range_
-        self._current_ammo = max_ammo
-        self._max_ammo = max_ammo
+    def __init__(self, dmg: int, action_pts: int, range_: int, ammo: Union[int, float]) -> None:
 
-    @staticmethod
-    def _raise_error_for_bad_input(atk_dmg, range_):
-        if atk_dmg <= 0 or range_ < 0:
-            raise ValueError('atk_dmg must be greater than 0. Range must be greater than or equal to 0.')
+        self._dmg = PositiveStat(dmg)
+        self._action = PositiveStat(action_pts)
+        self._range = PositiveStat(range_)
+        self._ammo = PositiveStat(ammo)
 
     @property
-    def atk_dmg(self):
-        return self._atk_dmg
+    def dmg(self):
+        return self._dmg.max
+
+    @property
+    def action_pts(self):
+        return self._action.max
 
     @property
     def range(self):
-        return self._range
+        return self._range.max
 
     @property
-    def current_ammo(self):
-        return self._current_ammo
+    def ammo(self):
+        return self._ammo.current
+
+    @property
+    def max_ammo(self):
+        return self._ammo.max
+
+    def use_weapon(self):
+        if self.ammo <= 0:
+            raise OutOfAmmo()
+        self._ammo.modify_current(-1)
+        return self.dmg
 
     def refill_ammo(self):
-        self._current_ammo = self._max_ammo
+        self._ammo.reset()
 
 
-class SniperRifle(Weapon):
-    def __init__(self):
-        dmg = 50
-        range_ = 10
-        ammo = 10
-        super(SniperRifle, self).__init__(dmg, range_, ammo)
+class MeleeWeapon(Weapon):
+    def __init__(self, dmg, action_pts, range_=1, ammo=float('inf')):
+        super(MeleeWeapon, self).__init__(dmg, action_pts, range_, ammo)
+
+
+class RangedWeapon(Weapon):
+    def __init__(self, dmg, action_pts, range_, ammo):
+        super(RangedWeapon, self).__init__(dmg, action_pts, range_, ammo)

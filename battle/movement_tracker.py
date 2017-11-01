@@ -53,7 +53,7 @@ class MovementTracker(object):
         return True
 
     def has_enough_move(self, unit: Soldier, mv_pts: int) -> bool:
-        return unit.can_move(mv_pts)
+        return unit.can_act(mv_pts)
 
     def get_move_pts(self, unit: Soldier, direction: Direction) -> int:
         point = self.get_point(unit)
@@ -64,4 +64,3 @@ class MovementTracker(object):
         new_tile = self._map.get_tile(new_point)
         move_points = current_tile.move_pts(new_tile)
         return move_points
-
