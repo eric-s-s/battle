@@ -32,7 +32,8 @@ class Stat(object):
         self._current = min(self._current, self.max)
 
     def adjust(self, modifier):
-        return Stat(self._max + modifier)
+        class_ = self.__class__
+        return class_(self._max + modifier)
 
 
 class PositiveStat(Stat):

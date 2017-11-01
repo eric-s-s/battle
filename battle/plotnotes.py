@@ -36,10 +36,10 @@ for index, name in enumerate(names):
     ax.annotate(name, (pt.x, pt.y))
 
 
-scatter = ax.scatter([], [])
-annotations = []
-
-
+# scatter = ax.scatter([], [])
+# annotations = []
+#
+# from random import random
 # def animate(thing, ann_lst, scatter):
 #     # for el in ann_lst:
 #     #     el.remove()
@@ -56,6 +56,7 @@ annotations = []
 #         ann_lst.append(ann)
 #     return scatter
 #
+# from matplotlib.animation import FuncAnimation
 #
 # ani = FuncAnimation(fig, animate, fargs=(annotations, scatter), frames=10, interval=500)
 

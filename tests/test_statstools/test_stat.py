@@ -97,6 +97,7 @@ class TestStat(unittest.TestCase):
         self.assertEqual(stat.max, 6)
         self.assertEqual(stat.current, 6)
 
+    # TODO test with subclass
     def test_adjust(self):
         stat = Stat(3)
         new = stat.adjust(3)
