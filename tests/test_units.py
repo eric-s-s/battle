@@ -1,5 +1,6 @@
 import unittest
-from battle.units import Soldier, FIST, GUN
+
+from battle.players.units import Soldier, FIST, GUN
 from battle.weapon import MeleeWeapon
 
 

@@ -3,7 +3,7 @@ from typing import Dict
 from battle.maptools.direction import Direction
 from battle.maptools.map import Map
 from battle.maptools.point import Point
-from battle.units import Soldier
+from battle.players.units import Soldier
 
 
 class MovementTracker(object):

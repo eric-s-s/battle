@@ -1,9 +1,9 @@
 from typing import Dict, List, Tuple
 
+from battle.lineofsight import LineOfSight
 from battle.maptools.map import Map
 from battle.maptools.point import Point
-from battle.units import Soldier
-from battle.lineofsight import LineOfSight
+from battle.players.units import Soldier
 
 
 class RangeFinder(object):

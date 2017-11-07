@@ -3,7 +3,7 @@ import unittest
 from battle.maptools.map import Map, MapPlacementError
 from battle.maptools.point import Point
 from battle.maptools.tile import Tile
-from battle.units import Soldier
+from battle.players.units import Soldier
 
 
 class TestMap(unittest.TestCase):

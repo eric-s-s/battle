@@ -1,7 +1,7 @@
-from battle.rangefinder import RangeFinder
 from battle.maptools.map import Map
 from battle.maptools.point import Point
-from battle.units import Soldier
+from battle.players.units import Soldier
+from battle.rangefinder import RangeFinder
 from battle.weapon import RangedWeapon
 
 
