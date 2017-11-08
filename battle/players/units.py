@@ -1,6 +1,5 @@
 from battle.statstools.stat import PositiveStat
 from battle.weapon import MeleeWeapon, RangedWeapon, Weapon, OutOfAmmo
-from battle.players.teams import Teams
 
 
 FIST = MeleeWeapon(dmg=1, action_pts=1)
@@ -8,20 +7,13 @@ GUN = RangedWeapon(dmg=5, action_pts=2, range_=5, ammo=10)
 
 
 class Soldier(object):
-    def __init__(self, t_name = None, action_pts: int = 3, health: int = 100, heal_pct: float = 5.0):
-        self._team = Teams(t_name)
+    def __init__(self, action_pts: int = 3, health: int = 100, heal_pct: float = 5.0):
         self._action_pts = PositiveStat(action_pts)
         self._health = PositiveStat(health)
 
         self._healing_pct = heal_pct
 
         self._weapon = FIST
-
-    def has_team(self):
-        return bool(t_name)
-
-    def get_team(self):
-        return self._team
 
     def get_perimeter_size(self) -> int:
         return self._weapon.range
@@ -52,8 +44,6 @@ class Soldier(object):
 
     def attack(self, opponent):
         action_pts = self._weapon.action_pts
-        if not self.has_team():
-            return None
         if not self.can_act(action_pts):
             return None
         self._action_pts.modify_current(-action_pts)

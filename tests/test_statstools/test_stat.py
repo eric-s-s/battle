@@ -105,7 +105,7 @@ class TestStat(unittest.TestCase):
         self.assertEqual(new.max, 6)
         self.assertEqual(new.static_max, 6)
         self.assertEqual(new.current, 6)
-=
+
     def test_PositiveStat_init(self):
         stat = PositiveStat(-3)
         self.assertEqual(stat.static_max, 0)
