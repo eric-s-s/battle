@@ -1,6 +1,6 @@
 import unittest
 
-from battle.players.units import Soldier, FIST, GUN
+from battle.players.units import Soldier, FIST, GUN, Base
 from battle.weapon import MeleeWeapon
 
 
@@ -167,6 +167,10 @@ class TestSoldier(unittest.TestCase):
         self.assertEqual(self.soldier.get_action_points(), 3)
         self.assertEqual(self.soldier.get_health(), 0)
 
+    def test_Base(self):
+        base = Base()
+        self.assertEqual(base.get_action_points(), 0)
+        self.assertEqual(base.get_health(), float('inf'))
 
 
 

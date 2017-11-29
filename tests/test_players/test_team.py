@@ -10,47 +10,49 @@ class TestTeam(unittest.TestCase):
     def setUp(self):
         tiles = [Tile() for _ in range(9)]
         self.map = Map(3, 3, tiles)
-        self.team = Team('test', self.map)
+        self.team = Team(Point(0, 0), self.map)
 
     def test_init(self):
         tiles = [Tile() for _ in range(9)]
         the_map = Map(3, 3, tiles)
-        team = Team('test', the_map)
-        self.assertEqual(team.players, set())
+        team = Team(Point(0, 0), the_map)
+        self.assertEqual(team.players, [])
+        self.assertEqual(team.home, Point(0, 0))
+
     def test_players_returns_a_copy(self):
         x = self.team.players
-        x.add(123)
-        self.assertEqual(self.team.players, set())
+        x.append(123)
+        self.assertEqual(self.team.players, [])
 
     def test_add_player(self):
         unit = Soldier()
         self.team.add_player(unit)
-        self.assertEqual(self.team.players, {unit})
+        self.assertEqual(self.team.players, [unit])
 
     def test_add_player_dupe(self):
         unit = Soldier()
         self.team.add_player(unit)
         self.team.add_player(unit)
-        self.assertEqual(self.team.players, {unit})
+        self.assertEqual(self.team.players, [unit])
 
     def test_add_player_multiple_players(self):
         unit = Soldier()
         unit_2 = Soldier()
         self.team.add_player(unit)
         self.team.add_player(unit_2)
-        self.assertEqual(self.team.players, {unit, unit_2})
+        self.assertEqual(self.team.players, [unit, unit_2])
 
-    def test_del_player(self):
+    def test_unteam_player(self):
         unit = Soldier()
         unit_2 = Soldier()
         self.team.add_player(unit)
         self.team.add_player(unit_2)
-        self.team.del_player(unit)
-        self.assertEqual(self.team.players, {unit_2})
+        self.team.unteam_player(unit)
+        self.assertEqual(self.team.players, [unit_2])
 
-    def test_del_player_not_in_team(self):
+    def test_unteam_player_not_in_team(self):
         unit = Soldier()
-        self.assertRaises(ValueError, self.team.del_player, unit)
+        self.assertRaises(ValueError, self.team.unteam_player, unit)
 
     def test_is_on_team_true(self):
         unit = Soldier()
@@ -62,19 +64,14 @@ class TestTeam(unittest.TestCase):
         self.team.add_player(unit)
         self.assertFalse(self.team.is_on_team(Soldier()))
 
-    def test_coordinates_units_not_on_map(self):
-        unit = Soldier()
-        unit_2 = Soldier()
-        self.team.add_player(unit)
-        self.team.add_player(unit_2)
-        self.assertEqual(self.team.coordinates(), {unit: None, unit_2: None})
+    def test_spawn_no_unplaced_players(self):
+        raise NotImplementedError
 
-    def test_coordinates_units_on_map(self):
-        unit = Soldier()
-        unit_2 = Soldier()
-        self.team.add_player(unit)
-        self.team.add_player(unit_2)
-        self.map.place_unit(unit, Point(0, 0))
-        self.map.place_unit(unit_2, Point(0, 1))
-        self.assertEqual(self.team.coordinates(), {unit: Point(0, 0), unit_2: Point(0, 1)})
+    def test_spawn_only_unplaced_players(self):
+        raise NotImplementedError
 
+    def test_spawn_both_placed_and_unplaced(self):
+        raise NotImplementedError
+
+    def test_spawn_no_room_on_map(self):
+        raise NotImplementedError
