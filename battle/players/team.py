@@ -22,8 +22,12 @@ class Team(object):
         return self._base
 
     @property
-    def players(self):
-        return self._placed_units[:] + self._unplaced_units[:]
+    def deployed(self):
+        return self._placed_units[:]
+
+    @property
+    def undeployed(self):
+        return  self._unplaced_units[:]
 
     def add_player(self, player: Soldier):
         if not self.is_on_team(player):
@@ -40,7 +44,7 @@ class Team(object):
             raise ValueError('Player is not on the team')
 
     def is_on_team(self, player: Soldier):
-        return player in self.players
+        return player in self.deployed + self.undeployed
 
     def spawn(self):
         if not self._unplaced_units:
