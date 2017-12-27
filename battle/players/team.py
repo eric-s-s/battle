@@ -1,4 +1,3 @@
-from typing import List
 from battle.maptools.point import Point
 from battle.maptools.map import Map
 from battle.players.units import Soldier, Base
