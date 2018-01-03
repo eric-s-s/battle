@@ -27,9 +27,18 @@ class Vector(object):
         x_val = abs(self.x)
         if self.x < 0:
             x_dir = x_dir.opposite()
+
         y_dir = Direction.N
         y_val = abs(self.y)
         if self.y < 0:
             y_dir = y_dir.opposite()
 
         return (x_dir, x_val), (y_dir, y_val)
+
+    def __eq__(self, other):
+        if not isinstance(other, Vector):
+            return False
+        return self.x == other.x and self.y == other.y
+
+    def __repr__(self):
+        return 'Vector({}, {})'.format(self.x, self.y)

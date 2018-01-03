@@ -1,8 +1,11 @@
-from collections import deque
+from collections import deque, namedtuple
+from typing import Dict
 from enum import Enum
 from battle.maptools.direction import Direction
 from battle.maptools.vector import Vector
 
+
+DangerOpportunity = namedtuple('DangerOpportunity', ['danger', 'opportunity'])
 
 
 class Token(Enum):
@@ -15,6 +18,14 @@ class Token(Enum):
     OBJECTIVE = (0, 1)
     ATTACKING = (1, 2)
     # put in more.
+
+    @property
+    def danger(self):
+        return self.value[0]
+
+    @property
+    def opportunity(self):
+        return self.value[1]
 
 
 class FootPrint(object):
@@ -35,6 +46,11 @@ class FootPrint(object):
     def team(self):
         return self._team
 
+    def vectorize(self):
+        danger = Vector.from_dir_and_mag(self.direction, self.token.danger)
+        opportunity = Vector.from_dir_and_mag(self.direction, self.token.opportunity)
+        return DangerOpportunity(danger=danger, opportunity=opportunity)
+
 
 class FootPrintPackage(object):
     def __init__(self, max_size=10):
@@ -46,6 +62,21 @@ class FootPrintPackage(object):
     @property
     def footprints(self):
         return list(self._stack)
+
+    def team_vectors(self):
+        answer = {}  # type: Dict['Team', DangerOpportunity]
+        for footprint in self._stack:
+            team = footprint.team
+            if team in answer:
+                current = answer[team]
+                vectors = footprint.vectorize()  # type: DangerOpportunity
+                new_danger = current.danger.add(vectors.danger)
+                new_opportunity = current.opportunity.add(vectors.opportunity)
+                answer[team] = DangerOpportunity(danger=new_danger, opportunity=new_opportunity)
+            else:
+                answer[team] = footprint.vectorize()
+
+        return answer
 
 
 

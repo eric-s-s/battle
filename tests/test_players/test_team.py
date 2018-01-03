@@ -134,8 +134,6 @@ class TestTeam(unittest.TestCase):
             self.team.add_player(soldier)
         for _ in range(len(units)):
             self.team.spawn()
-        print(self.team.home.at_distance(1))
-        print(self.team.home.at_distance(2))
         expected_points = [Point(0, 0), Point(2, 0), Point(0, 2)]
         for soldier, point in zip(units, expected_points):
             self.assertEqual(self.map.get_unit(point), soldier)
