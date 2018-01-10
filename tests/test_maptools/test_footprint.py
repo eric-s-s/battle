@@ -1,6 +1,8 @@
 import unittest
 
-from battle.maptools.footprint import FootPrint, Token, FootPrintPackage
+from itertools import cycle
+
+from battle.maptools.footprint import FootPrint, Token, FootPrintPackage, DangerOpportunity
 from battle.maptools.direction import Direction
 from battle.players.team import Team
 from battle.maptools.point import Point
@@ -115,4 +117,46 @@ class TestFootPrint(unittest.TestCase):
         fpp.push(fp_3)
         self.assertEqual(fpp.footprints, [fp_3, fp_2])
 
-    """test team vectors"""
+    def test_team_vectors_one_per_team(self):
+
+        fp_1 = FootPrint(Token.DANGER, W, self.team_1)
+        for token, direction in zip(Token, cycle(Direction)):
+            fpp = FootPrintPackage()
+            fp_2 = FootPrint(token, direction, self.team_2)
+            fpp.push(fp_1)
+            fpp.push(fp_2)
+            answer = fpp.team_vectors()
+            self.assertEqual(answer,
+                             {self.team_1: DangerOpportunity(danger=Vector(-1, 0), opportunity=Vector(0, 0)),
+                              self.team_2: fp_2.vectorize(),
+                              })
+
+    def test_team_vectors_no_footprints(self):
+        fpp = FootPrintPackage()
+        self.assertEqual(fpp.team_vectors(), {})
+
+    def test_team_vectors_multiple_per_team(self):
+        fpp = FootPrintPackage()
+
+        fp_1_a = FootPrint(Token.ATTACKING, W, self.team_1)
+        fp_1_b = FootPrint(Token.DANGER, S, self.team_1)
+
+        fp_2_a = FootPrint(Token.ATTACKING, S, self.team_2)
+        fp_2_b = FootPrint(Token.OBJECTIVE, N, self.team_2)
+        fp_2_c = FootPrint(Token.DEAD, N, self.team_2)
+
+        fpp.push(fp_1_a)
+        fpp.push(fp_1_b)
+        fpp.push(fp_2_a)
+        fpp.push(fp_2_b)
+        fpp.push(fp_2_c)
+
+        answer = fpp.team_vectors()
+        team_1_answer = answer[self.team_1]
+        team_2_answer = answer[self.team_2]
+
+        self.assertEqual(team_1_answer.danger, Vector(-1, -1))
+        self.assertEqual(team_1_answer.opportunity, Vector(-2, 0))
+
+        self.assertEqual(team_2_answer.danger, Vector(0, 1))
+        self.assertEqual(team_2_answer.opportunity, Vector(0, -1))
