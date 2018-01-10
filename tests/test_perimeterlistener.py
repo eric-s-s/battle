@@ -1,12 +1,12 @@
 from unittest import TestCase
 
-from battle.weapon import RangedWeapon, MeleeWeapon
-from battle.units import Soldier, FIST
-from battle.perimiterlistener import PerimeterListener
-from battle.rangefinder import RangeFinder
 from battle.maptools.map import Map
 from battle.maptools.point import Point
 from battle.maptools.tile import Tile
+from battle.perimiterlistener import PerimeterListener
+from battle.players.units import Soldier, FIST
+from battle.rangefinder import RangeFinder
+from battle.weapon import RangedWeapon, MeleeWeapon
 
 
 class TestPerimeterListener(TestCase):

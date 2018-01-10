@@ -3,7 +3,7 @@ from typing import Dict, List, Union
 from battle.maptools.direction import Direction
 from battle.maptools.point import Point
 from battle.maptools.tile import Tile
-from battle.units import Soldier
+from battle.players.units import Soldier
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 

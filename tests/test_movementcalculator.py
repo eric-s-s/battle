@@ -1,11 +1,11 @@
 import unittest
 
+from battle.maptools.direction import Direction
 from battle.maptools.map import Map
 from battle.maptools.point import Point
-from battle.units import Soldier
 from battle.maptools.tile import Tile, ImpassableTile
 from battle.movementcalculator import MovementCalculator
-from battle.maptools.direction import Direction
+from battle.players.units import Soldier
 
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 

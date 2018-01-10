@@ -1,3 +1,5 @@
+from typing import Union
+
 from battle.statstools.stat import PositiveStat
 from battle.weapon import MeleeWeapon, RangedWeapon, Weapon, OutOfAmmo
 
@@ -7,7 +9,7 @@ GUN = RangedWeapon(dmg=5, action_pts=2, range_=5, ammo=10)
 
 
 class Soldier(object):
-    def __init__(self, action_pts: int = 3, health: int = 100, heal_pct: float = 5.0):
+    def __init__(self, action_pts: int = 3, health: Union[float, int] = 100, heal_pct: float = 5.0):
         self._action_pts = PositiveStat(action_pts)
         self._health = PositiveStat(health)
 
@@ -76,10 +78,9 @@ class Soldier(object):
         self.reset_move_points()
 
 
-class Example(Soldier):
-    def __init__(self, weapon: Weapon, **kwargs):
-        super(Example, self).__init__(**kwargs)
-        self.equip_weapon(weapon)
+class Base(Soldier):
+    def __init__(self):
+        super(Base, self).__init__(action_pts=0, health=float('inf'), heal_pct=0)
 
 
 
