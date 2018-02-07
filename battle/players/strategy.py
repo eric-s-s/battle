@@ -1,36 +1,26 @@
-from enum import Enum
 import random
+from typing import List
 
-
-class Action(Enum):
-    ATTACK = 1
-    RETREAT = 2
-    FORTIFY = 3
-    AVOID = 4
-
-    @classmethod
-    def to_list(cls):
-        return list(cls.__members__.values())
+from battle.maptools.footprint import DangerOpportunity
+from battle.players.action import Action
 
 
 class Strategy(object):
-    def __init__(self, team, map_):
-        self._team = team
-        self._map = map_
-
-    def get_action(self) -> Action:
-        raise NotImplementedError
-
-    def act(self, action):
-        raise NotImplementedError
-
-    
-class BasicStrategy(Strategy):
-    def __init__(self, team, map_):
-        super(BasicStrategy, self).__init__(team, map_)
-
-    def get_action(self):
-        return random.choice(list(Action.to_list()))
-
-    def act(self, action):
+    def __init__(self):
         pass
+
+    def get_action(self, ally: DangerOpportunity, enemy: DangerOpportunity) -> List[Action]:
+        actions = []
+        ally_danger = ally.danger
+        ally_opportunity = ally.opportunity
+        enemy_danger = enemy.danger
+        enemy_opportunity = enemy.opportunity
+        return actions
+
+
+class BasicStrategy(Strategy):
+    def __init__(self):
+        super(BasicStrategy, self).__init__()
+
+    def get_action(self, ally, enemy):
+        return random.choice(list(Action.to_list()))
