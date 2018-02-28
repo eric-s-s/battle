@@ -1,5 +1,6 @@
 from typing import Union
 
+from battle.players.strategy import StupidStrategy
 from battle.statstools.stat import PositiveStat
 from battle.weapon import MeleeWeapon, RangedWeapon, Weapon, OutOfAmmo
 
@@ -10,12 +11,17 @@ GUN = RangedWeapon(dmg=5, action_pts=2, range_=5, ammo=10)
 
 class Soldier(object):
     def __init__(self, action_pts: int = 3, health: Union[float, int] = 100, heal_pct: float = 5.0):
+        self._strategy = StupidStrategy()
         self._action_pts = PositiveStat(action_pts)
         self._health = PositiveStat(health)
 
         self._healing_pct = heal_pct
 
         self._weapon = FIST
+
+    @property
+    def strategy(self):
+        return self._strategy
 
     def get_perimeter_size(self) -> int:
         return self._weapon.range

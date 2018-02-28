@@ -118,6 +118,27 @@ class TestMap(unittest.TestCase):
         self.map.place_unit(self.unit, Point(1, 1))
         self.assertFalse(self.map.can_place_unit(Point(1, 1)))
 
+    def test_get_unit_is_none_when_no_unit(self):
+        self.assertIsNone(self.map.get_unit(Point(1, 1)))
+
+    def test_get_unit(self):
+        unit = Soldier()
+        point = Point(1, 1)
+        self.map.place_unit(unit, point)
+        self.assertIs(unit, self.map.get_unit(point))
+
+        self.assertIsNone(self.map.get_unit(Point(0, 0)))
+
+    def test_get_point(self):
+        self.map.place_unit(self.unit, Point(0, 0))
+        self.assertEqual(self.map.get_point(self.unit), Point(0, 0))
+        self.map.remove_unit(Point(0, 0))
+        self.map.place_unit(self.unit, Point(0, 1))
+        self.assertEqual(self.map.get_point(self.unit), Point(0, 1))
+
+    def test_get_point_none(self):
+        self.assertEqual(self.map.get_point(self.unit), None)
+
     def test_place_unit_error_by_not_on_map(self):
         self.assertRaises(MapPlacementError, self.map.place_unit, self.unit, Point(10, 1))
 
@@ -130,9 +151,14 @@ class TestMap(unittest.TestCase):
         self.map.place_unit(self.unit, Point(1, 1))
         self.assertRaises(MapPlacementError, self.map.place_unit, unit_2, Point(1, 1))
 
+    def test_place_unit_error_by_unit_placed_twice(self):
+        self.map.place_unit(self.unit, Point(0, 0))
+        self.assertRaises(MapPlacementError, self.map.place_unit, self.unit, Point(1, 2))
+
     def test_place_unit(self):
         self.map.place_unit(self.unit, Point(1, 1))
         self.assertIs(self.map.get_unit(Point(1, 1)), self.unit)
+        self.assertEqual(self.map.get_point(self.unit), Point(1, 1))
 
     def test_has_unit_point_not_on_map_false(self):
         self.assertFalse(self.map.has_unit(Point(-1, -1)))
@@ -145,30 +171,11 @@ class TestMap(unittest.TestCase):
         self.assertTrue(self.map.has_unit(Point(1, 1)))
         self.assertFalse(self.map.has_unit(Point(2, 1)))
 
-    def test_get_unit_is_none_when_no_unit(self):
-        self.assertIsNone(self.map.get_unit(Point(1, 1)))
-
-    def test_get_unit(self):
-        unit = Soldier()
-        point = Point(1, 1)
-        self.map.place_unit(unit, point)
-        self.assertIs(unit, self.map.get_unit(point))
-
-        self.assertIsNone(self.map.get_unit(Point(0, 0)))
-
     def test_remove_unit(self):
         self.map.place_unit(self.unit, Point(1, 1))
         self.map.remove_unit(Point(1, 1))
         self.assertTrue(self.map.can_place_unit(Point(1, 1)))
-
-    def test_remove_all_units(self):
-        points = Point(0, 0).to_rectangle(2, 2)
-        for point in points:
-            self.map.place_unit(Soldier(), point)
-        self.map.remove_all_units()
-
-        for point in points:
-            self.assertFalse(self.map.has_unit(point))
+        self.assertEqual(self.map.get_point(self.unit), None)
 
 
 def get_tiles_without_points(width, height):

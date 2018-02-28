@@ -26,7 +26,7 @@ class Team(object):
 
     @property
     def undeployed(self):
-        return  self._unplaced_units[:]
+        return self._unplaced_units[:]
 
     def add_player(self, player: Soldier):
         if not self.is_on_team(player):

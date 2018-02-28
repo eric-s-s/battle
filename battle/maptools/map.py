@@ -17,7 +17,8 @@ class Map(object):
     def __init__(self, width: int, height: int, tiles: List[Tile]):
         self._all_points = Point(0, 0).to_rectangle(width, height)
         self._tiles = dict.fromkeys(self._all_points, None)  # type: Dict[Point, Tile]
-        self._units = dict.fromkeys(self._all_points, None)  # type: Dict[Point, Soldier]
+        self._points_to_units = {}  # type: Dict[Point, Soldier]
+        self._units_to_points = {}  # type: Dict[Soldier, Point]
 
         self._lay_tiles(tiles)
 
@@ -64,28 +65,31 @@ class Map(object):
         return self._tiles[point]
 
     def can_place_unit(self, point: Point) -> bool:
-        return self.has_tile(point) and self._units[point] is None
+        return self.has_tile(point) and self._points_to_units.get(point) is None
 
     def place_unit(self, unit: Soldier, point: Point):
-        self._raise_unit_placement_error(point)
-        self._units[point] = unit
+        self._raise_unit_placement_error(point, unit)
+        self._points_to_units[point] = unit
+        self._units_to_points[unit] = point
 
-    def _raise_unit_placement_error(self, point: Point):
-        if not self.can_place_unit(point):
+    def _raise_unit_placement_error(self, point: Point, unit: Soldier):
+        if not self.can_place_unit(point) or self.get_point(unit):
             raise MapPlacementError('illegal unit placement')
 
     def get_unit(self, point: Point) -> Soldier:
-        return self._units[point]
+        return self._points_to_units.get(point)
+
+    def get_point(self, unit: Soldier) -> Point:
+        return self._units_to_points.get(unit)
 
     def has_unit(self, point: Point) -> bool:
-        return self._units.get(point) is not None
+        return self._points_to_units.get(point) is not None
 
     def remove_unit(self, point: Point):
-        self._units[point] = None
-
-    def remove_all_units(self):
-        for key in self._units:
-            self._units[key] = None
+        unit = self._points_to_units[point]
+        self._points_to_units[point] = None
+        if unit is not None:
+            del self._units_to_points[unit]
 
 
 def separate_tiles(tiles):
