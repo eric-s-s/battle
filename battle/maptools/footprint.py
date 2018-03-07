@@ -2,10 +2,7 @@ from collections import deque, namedtuple
 from typing import Dict
 from enum import Enum
 from battle.maptools.direction import Direction
-from battle.maptools.vector import Vector
-
-
-DangerOpportunity = namedtuple('DangerOpportunity', ['danger', 'opportunity'])
+from battle.maptools.vector import Vector, DangerOpportunity
 
 
 class Token(Enum):
@@ -46,7 +43,7 @@ class FootPrint(object):
     def team(self):
         return self._team
 
-    def vectorize(self):
+    def vectorize(self) -> DangerOpportunity:
         danger = Vector.from_dir_and_mag(self.direction, self.token.danger)
         opportunity = Vector.from_dir_and_mag(self.direction, self.token.opportunity)
         return DangerOpportunity(danger=danger, opportunity=opportunity)
@@ -67,27 +64,7 @@ class FootPrintPackage(object):
         answer = {}  # type: Dict['Team', DangerOpportunity]
         for footprint in self._stack:
             team = footprint.team
-            if team in answer:
-                current = answer[team]
-                vectors = footprint.vectorize()  # type: DangerOpportunity
-                new_danger = current.danger.add(vectors.danger)
-                new_opportunity = current.opportunity.add(vectors.opportunity)
-                answer[team] = DangerOpportunity(danger=new_danger, opportunity=new_opportunity)
-            else:
-                answer[team] = footprint.vectorize()
+            current = answer.get(footprint.team, DangerOpportunity.empty())
+            answer[team] = current.add(footprint.vectorize())
 
         return answer
-
-
-
-
-    # @property
-    # def team_matrices(self):
-    #     """returns data for each team's traffic/direction, danger/direction, opportunity/direction"""
-    #     data = []
-    #     for foot_print in self.footprints:
-
-    #
-    # def calculate_danger_and_opportunity(self):
-    #     pass
-

@@ -42,3 +42,31 @@ class Vector(object):
 
     def __repr__(self):
         return 'Vector({}, {})'.format(self.x, self.y)
+
+
+class DangerOpportunity(object):
+    def __init__(self, danger: Vector, opportunity: Vector):
+        self._danger = danger
+        self._opportunity = opportunity
+
+    @property
+    def danger(self):
+        return self._danger
+
+    @property
+    def opportunity(self):
+        return self._opportunity
+
+    def add(self, other: 'DangerOpportunity'):
+        new_danger = self.danger.add(other.danger)
+        new_opportunity = self.opportunity.add(other.opportunity)
+        return DangerOpportunity(new_danger, new_opportunity)
+
+    @classmethod
+    def empty(cls):
+        return DangerOpportunity(Vector(0, 0), Vector(0, 0))
+
+    def __eq__(self, other):
+        if not isinstance(other, DangerOpportunity):
+            return False
+        return (self.danger, self.opportunity) == (other.danger, other.opportunity)

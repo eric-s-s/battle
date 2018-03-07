@@ -1,6 +1,6 @@
 import unittest
 
-from battle.maptools.vector import Vector
+from battle.maptools.vector import Vector, DangerOpportunity
 from battle.maptools.direction import Direction
 
 N, S, E, W = Direction
@@ -73,3 +73,51 @@ class TestVector(unittest.TestCase):
     def test_repr(self):
         self.assertEqual(repr(Vector(1, -1)), 'Vector(1, -1)')
 
+    def test_dangeroppurtunity_init(self):
+        vector_a = Vector(1, 2)
+        vector_b = Vector(3, 4)
+        test = DangerOpportunity(vector_a, vector_b)
+        self.assertEqual(test.danger, vector_a)
+        self.assertEqual(test.opportunity, vector_b)
+
+    def test_dangeroppurtunity_empty(self):
+        test = DangerOpportunity.empty()
+        self.assertEqual(test.danger, Vector(0, 0))
+        self.assertEqual(test.opportunity, Vector(0, 0))
+
+    def test_dangeroppurtunity_eq_true(self):
+        vector_a = Vector(1, 2)
+        vector_b = Vector(3, 4)
+        self.assertEqual(DangerOpportunity(vector_a, vector_b), DangerOpportunity(vector_a, vector_b))
+
+    def test_dangeroppurtunity_eq_false_by_type(self):
+        vector_a = Vector(1, 2)
+        vector_b = Vector(3, 4)
+        self.assertNotEqual(DangerOpportunity(vector_a, vector_b), (vector_a, vector_b))
+
+    def test_dangeroppurtunity_eq_false_by_order(self):
+        vector_a = Vector(1, 2)
+        vector_b = Vector(3, 4)
+        self.assertNotEqual(DangerOpportunity(vector_a, vector_b), DangerOpportunity(vector_b, vector_a))
+
+    def test_dangeroppurtunity_eq_false_by_number(self):
+        vector_a = Vector(1, 2)
+        vector_b = Vector(3, 4)
+        vector_c = Vector(-1, 0)
+        self.assertNotEqual(DangerOpportunity(vector_a, vector_b), DangerOpportunity(vector_a, vector_c))
+
+    def test_add_empty(self):
+        vector_a = Vector(1, 2)
+        vector_b = Vector(3, 4)
+        test = DangerOpportunity(vector_a, vector_b)
+        new = test.add(DangerOpportunity.empty())
+        self.assertEqual(test, new)
+        self.assertIsNot(test, new)
+
+    def test_add_non_empty(self):
+        vector_a = Vector(1, 2)
+        vector_b = Vector(3, 5)
+        test = DangerOpportunity(vector_a, vector_b)
+        to_add = DangerOpportunity(Vector(1, 1), Vector(-1, -1))
+        expected = DangerOpportunity(Vector(2, 3), Vector(2, 4))
+        self.assertEqual(test.add(to_add), expected)
