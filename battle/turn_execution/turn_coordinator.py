@@ -11,11 +11,74 @@ from battle.movementcalculator import MovementCalculator
 
 
 class Actionator(object):
-    def __init__(self, unit: Soldier, action, perimeter_listener: PerimeterListener, map_: Map):
+    def __init__(self, unit: Soldier, action, perimeter_listener: PerimeterListener, map_: Map, team: Team):
         self._unit = unit
         self._action = action
         self._pl = perimeter_listener
         self._map = map_
+        self._team = team
+
+    def _get_targets_in_range(self):
+        rf = RangeFinder(self._map)
+        weapon = self._unit.get_weapon()
+        # TODO: assuming ranged weapon!!!
+        pt = self._map.get_point(self._unit)
+        target = []
+        for dist, pt_advantage in rf.get_attack_ranges_ranged(pt, weapon.range).items():
+            for pt, advantage in pt_advantage:
+                enemy = self._map.get_unit(pt)
+                if enemy is not None and not self._team.is_on_team(enemy):
+                    target.append((enemy, advantage))
+        return target  # List[(enemy, advantage)]
+
+    def _get_targets_in_sight(self):
+        rf = RangeFinder(self._map)
+
+        pt = self._map.get_point(self._unit)
+        target = []
+        for dist, pt_advantage in rf.get_sight_ranges(pt, self._unit.get_perimeter_size()).items():  # TODO: what is sight range?
+            for pt, advantage in pt_advantage:
+                other = self._map.get_unit(pt)
+                if other is not None:
+                    target.append((other, self._team.is_on_team(self._unit)))
+        return target  # List[(unit, is_on_team)]
+
+    """
+    hw - type out in pseudo-code, how you will decide where someone moves and how far?
+    actions:
+    NULL
+
+    GO
+    STAY
+    ATTACK
+
+    ENEMY
+    ALLY
+
+    NEAREST
+    FURTHEST
+
+    STRONGEST
+    WEAKEST
+
+    HIGHEST
+    LOWEST
+
+    HEALTH
+    WEAPON
+    CONCENTRATION
+
+    OPPORTUNITY
+    DANGER
+
+    TOWARDS
+    AWAY
+
+
+
+    """
+
+
 
     def move(self, path):
         """
@@ -71,4 +134,3 @@ class TurnCoordinator(object):
         ally_vector = vectors.get(ally, DangerOpportunity.empty())
         enemy_vector = vectors.get(enemy, DangerOpportunity.empty())
         return unit.strategy.get_action(ally_vector, enemy_vector)
-

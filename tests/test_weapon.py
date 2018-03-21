@@ -68,3 +68,9 @@ class TestWeapon(unittest.TestCase):
         self.assertEqual(new.action_pts, 3)
         self.assertEqual(new.range, 4)
         self.assertEqual(new.ammo, 5)
+
+    def test_is_melee_weapon(self):
+        melee = MeleeWeapon(1, 2, 3)
+        ranged = RangedWeapon(2, 3, 4, 5)
+        self.assertTrue(melee.is_melee_weapon())
+        self.assertFalse(ranged.is_melee_weapon())

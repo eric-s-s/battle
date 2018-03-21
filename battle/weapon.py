@@ -43,6 +43,9 @@ class Weapon(object):
     def refill_ammo(self):
         self._ammo.reset()
 
+    def is_melee_weapon(self):
+        return isinstance(self, MeleeWeapon)
+
 
 class MeleeWeapon(Weapon):
     def __init__(self, dmg, action_pts, range_=1, ammo=float('inf')):

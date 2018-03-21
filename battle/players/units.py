@@ -26,6 +26,9 @@ class Soldier(object):
     def get_perimeter_size(self) -> int:
         return self._weapon.range
 
+    def get_sight_range(self) -> int:
+        return 10
+
     def get_action_points(self) -> int:
         return self._action_pts.current
 

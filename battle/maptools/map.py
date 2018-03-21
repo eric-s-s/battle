@@ -91,6 +91,10 @@ class Map(object):
         if unit is not None:
             del self._units_to_points[unit]
 
+    def remove_all_units(self):
+        self._points_to_units = {}
+        self._units_to_points = {}
+
 
 def separate_tiles(tiles):
     has_point = []
