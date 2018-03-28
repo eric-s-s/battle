@@ -146,6 +146,30 @@ class TestLineOfSight(unittest.TestCase):
         finish = Point(2, 1)
         self.assertFalse(sighting_tool.is_obstacle_higher_than_start(start, finish))
 
+    def test_is_obstacle_higher_than_start_slope_eq_one_pos_true(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 0, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 0, Point(2, 2): 0,
+                      Point(0, 3): 2, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        sighting_tool = LineOfSight(map_)
+        start = Point(0, 0)
+        finish = Point(2, 2)
+        self.assertTrue(sighting_tool.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_slope_eq_one_pos_false(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 2, Point(1, 1): 0, Point(2, 1): 2,
+                      Point(0, 2): 0, Point(1, 2): 2, Point(2, 2): 0,
+                      Point(0, 3): 2, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        sighting_tool = LineOfSight(map_)
+        start = Point(0, 0)
+        finish = Point(2, 2)
+        self.assertFalse(sighting_tool.is_obstacle_higher_than_start(start, finish))
+
     def test_is_obstacle_higher_than_start_slope_gt_neg_one_neg_true(self):
         elevations = {Point(0, 0): 1, Point(1, 0): 2, Point(2, 0): 0,
                       Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
@@ -168,6 +192,30 @@ class TestLineOfSight(unittest.TestCase):
         sighting_tool = LineOfSight(map_)
         start = Point(0, 3)
         finish = Point(2, 2)
+        self.assertFalse(sighting_tool.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_slope_eq_neg_one_neg_true(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 0, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 0, Point(2, 1): 0,
+                      Point(0, 2): 0, Point(1, 2): 2, Point(2, 2): 0,
+                      Point(0, 3): 1, Point(1, 3): 0, Point(2, 3): 0}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        sighting_tool = LineOfSight(map_)
+        start = Point(0, 3)
+        finish = Point(2, 1)
+        self.assertTrue(sighting_tool.is_obstacle_higher_than_start(start, finish))
+
+    def test_is_obstacle_higher_than_start_slope_eq_neg_one_neg_false(self):
+        elevations = {Point(0, 0): 1, Point(1, 0): 2, Point(2, 0): 0,
+                      Point(0, 1): 0, Point(1, 1): 2, Point(2, 1): 0,
+                      Point(0, 2): 2, Point(1, 2): 1, Point(2, 2): 2,
+                      Point(0, 3): 1, Point(1, 3): 2, Point(2, 3): 2}
+        tiles = [Tile(point=point, elevation=elevation) for point, elevation in elevations.items()]
+        map_ = Map(3, 4, tiles)
+        sighting_tool = LineOfSight(map_)
+        start = Point(0, 3)
+        finish = Point(2, 1)
         self.assertFalse(sighting_tool.is_obstacle_higher_than_start(start, finish))
 
     def test_is_obstacle_higher_than_start_slope_lt_neg_one_false(self):
