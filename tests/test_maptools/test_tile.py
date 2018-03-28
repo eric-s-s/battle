@@ -3,7 +3,7 @@ import unittest
 from battle.maptools.direction import Direction
 from battle.maptools.point import Point
 from battle.maptools.tile import Tile, ImpassableTile
-
+from battle.maptools.footprint import FootPrint, Token
 N, S, E, W = Direction.N, Direction.S, Direction.E, Direction.W
 
 
@@ -108,6 +108,46 @@ class TestTile(unittest.TestCase):
         self.assertEqual(high_mv_pts_tile.move_pts(self.tile), 100)
         self.assertEqual(default_tile.move_pts(self.tile), 1)
 
+    def test_add_footprint(self):
+        team = 'team'
+        footprint = FootPrint(Token.ATTACKING, Direction.N, team)
+        tile = Tile()
+        self.assertEqual(tile.footprint_vectors(), {})
+        tile.add_footprint(footprint)
+        self.assertEqual(tile.footprint_vectors(),
+                         {'team': footprint.vectorize()})
+
+    def test_add_footprint_multiple_footprints_single_team(self):
+        team = 'team'
+        footprint = FootPrint(Token.ATTACKING, Direction.N, team)
+        footprint2 = FootPrint(Token.DANGER, Direction.E, team)
+        tile = Tile()
+        self.assertEqual(tile.footprint_vectors(), {})
+        tile.add_footprint(footprint)
+        tile.add_footprint(footprint2)
+        self.assertEqual(tile.footprint_vectors(),
+                         {'team': footprint.vectorize().add(footprint2.vectorize())})
+
+    def test_add_footprint_multiple_footprints_multiple_teams(self):
+        team_1 = 'team_1'
+        footprint = FootPrint(Token.ATTACKING, Direction.N, team_1)
+        footprint2 = FootPrint(Token.DANGER, Direction.E, team_1)
+
+        team_2 = 'team_2'
+        footprint3 = FootPrint(Token.DEAD, Direction.W, team_2)
+        footprint4 = FootPrint(Token.NEUTRAL, Direction.S, team_2)
+
+        tile = Tile()
+        self.assertEqual(tile.footprint_vectors(), {})
+        tile.add_footprint(footprint)
+        tile.add_footprint(footprint4)
+        tile.add_footprint(footprint3)
+        tile.add_footprint(footprint2)
+
+        expected = {team_1: footprint.vectorize().add(footprint2.vectorize()),
+                    team_2: footprint3.vectorize().add(footprint4.vectorize())}
+
+        self.assertEqual(tile.footprint_vectors(), expected)
 
 if __name__ == '__main__':
     unittest.main()

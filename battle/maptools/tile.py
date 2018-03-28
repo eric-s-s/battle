@@ -1,15 +1,23 @@
 from typing import Union
 from battle.maptools.point import Point
+from battle.maptools.footprint import FootPrintPackage, FootPrint
 
 
 class Tile(object):
-    def __init__(self, elevation: Union[int, float] = 0, terrain_mv: int = 1, point: Point = None):
+    def __init__(self, elevation: Union[int, float] = 0, terrain_mv: int = 1, point: Point = None, max_footprints=10):
         if elevation != float('inf'):
             elevation = int(elevation)
         self._elevation = elevation
 
         self._terrain_mv = max(terrain_mv, 1)
         self._point = point
+        self._fpp = FootPrintPackage(max_size=max_footprints)
+
+    def add_footprint(self, footprint: FootPrint):
+        self._fpp.push(footprint)
+
+    def footprint_vectors(self):
+        return self._fpp.team_vectors()
 
     def get_elevation(self) -> Union[int, float]:
         return self._elevation

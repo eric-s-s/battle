@@ -8,14 +8,10 @@ from battle.rangefinder import RangeFinder
 
 
 class TestRangeFinder(unittest.TestCase):
-    test_map = Map(3, 3, [Tile() for _ in range(9)])
-
     def setUp(self):
+        self.test_map = Map(3, 3, [Tile() for _ in range(9)])
         self.ranger = RangeFinder(map_=self.test_map)
         self.soldier = Soldier()
-
-    def tearDown(self):
-        self.test_map.remove_all_units()
 
     def test_init(self):
         map_ = Map(2, 2, [Tile(), Tile(), Tile(), Tile()])

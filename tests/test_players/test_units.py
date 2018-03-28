@@ -27,6 +27,10 @@ class TestSoldier(unittest.TestCase):
         unit.equip_weapon(GUN)
         self.assertEqual(unit.get_perimeter_size(), 5)
 
+    def test_get_sight_rangs(self):
+        unit = Soldier()
+        self.assertEqual(unit.get_sight_range(), 10)
+
     def test_equip_weapon(self):
         stick = MeleeWeapon(3, 2)
         self.soldier.equip_weapon(stick)
