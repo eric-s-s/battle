@@ -54,6 +54,30 @@ class TestRangeFinder(unittest.TestCase):
         self.assertEqual(answer, {0: [Point(0, 0)],
                                   1: [Point(1, 0)]})
 
+    def test_get_all_usable_points_units_only_distance_zero(self):
+        origin = Point(1, 1)
+        self.assertEqual(self.ranger.get_all_usable_points_units_only(origin, 0), {0: []})
+        self.test_map.place_unit(Soldier(), origin)
+        self.assertEqual(self.ranger.get_all_usable_points_units_only(origin, 0), {0: [origin]})
+
+    def test_get_all_usable_points_units_only_distance(self):
+        origin = Point(0, 0)
+        self.test_map.place_unit(Soldier(), origin)
+        self.test_map.place_unit(Soldier(), Point(0, 1))
+        self.test_map.place_unit(Soldier(), Point(0, 2))
+        self.test_map.place_unit(Soldier(), Point(2, 2))
+        answer = self.ranger.get_all_usable_points_units_only(origin, 2)
+        expected = {
+            0: [origin],
+            1: [Point(0, 1)],
+            2: [Point(0, 2)]
+        }
+        self.assertEqual(answer, expected)
+
+    def test_get_all_usable_points_units_only_shortcut_for_distances_beyond_map(self):
+        expected = {key: [] for key in range(101)}
+        self.assertEqual(self.ranger.get_all_usable_points_units_only(Point(1, 1), 100), expected)
+
     def test_get_all_units_no_units(self):
         answer = self.ranger.get_all_units(Point(0, 0), 2)
         self.assertEqual(answer, {0: [], 1: [], 2: []})
@@ -131,6 +155,38 @@ class TestRangeFinder(unittest.TestCase):
                     1: [Point(1, 0), Point(0, 1)]}
         self.assertEqual(expected, RangeFinder(the_map).get_sight_ranges(origin, 1))
 
+    def test_get_sight_ranges_units_only_some_tiles_occupied(self):
+        points_to_elevation = {Point(0, 0): 1, Point(1, 0): 4,
+                               Point(0, 1): 5}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+
+        origin = Point(0, 0)
+        the_map.place_unit(Soldier(), origin)
+        the_map.place_unit(Soldier(), Point(0, 1))
+
+        expected = {0: [origin],
+                    1: [Point(0, 1)]}
+        self.assertEqual(expected, RangeFinder(the_map).get_sight_ranges_units_only(origin, 1))
+
+    def test_get_sight_ranges_units_only_all_tiles_occupied(self):
+        points_to_elevation = {Point(0, 0): 0, Point(1, 0): 1, Point(2, 0): 1,
+                               Point(0, 1): 1, Point(1, 1): 2, Point(2, 1): 2,
+                               Point(0, 2): 2, Point(1, 2): 1, Point(2, 2): 4}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        for point in points_to_elevation.keys():
+            the_map.place_unit(Soldier(), point)
+        origin = Point(0, 1)
+        answer = RangeFinder(the_map).get_sight_ranges_units_only(origin, 5)
+        expected = {key: [] for key in range(6)}
+        expected[0] = [origin]
+        expected[1] = sorted([Point(0, 0), Point(1, 1), Point(0, 2)])
+        expected[2] = sorted([Point(1, 0), Point(2, 1), Point(1, 2)])
+        expected[3] = sorted([Point(2, 2)])
+
+        self.assertEqual(answer, expected)
+
     def test_get_attack_ranges_ranged_no_points_off_map(self):
         points_to_elevation = {Point(0, 0): 0, Point(1, 0): -1, Point(2, 0): 1,
                                Point(0, 1): 1, Point(1, 1): 2, Point(2, 1): 2,
@@ -181,6 +237,48 @@ class TestRangeFinder(unittest.TestCase):
         expected = {0: [(origin, 0)],
                     1: [(Point(1, 0), -1), (Point(0, 1), -1)]}
         self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_ranged(origin, 1))
+
+    def test_get_attack_ranges_ranged_units_only_with_obstacles_no_units_placed(self):
+        points_to_elevation = {Point(0, 0): 0, Point(1, 0): 5, Point(2, 0): 0,
+                               Point(0, 1): 1, Point(1, 1): 1, Point(2, 1): 2,
+                               Point(0, 2): 2, Point(1, 2): 4, Point(2, 2): 4}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        origin = Point(0, 0)
+        expected = {key: [] for key in range(5)}
+        self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_ranged_units_only(origin, 4))
+
+    def test_get_attack_ranges_ranged_units_only_with_obstacles_all_units_placed(self):
+        points_to_elevation = {Point(0, 0): 0, Point(1, 0): 5, Point(2, 0): 0,
+                               Point(0, 1): 1, Point(1, 1): 1, Point(2, 1): 2,
+                               Point(0, 2): 2, Point(1, 2): 4, Point(2, 2): 4}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        for pt in points_to_elevation.keys():
+            the_map.place_unit(Soldier(), pt)
+        origin = Point(0, 0)
+        expected = {0: [(origin, 0)],
+                    1: [(Point(1, 0), -1), (Point(0, 1), -1)],
+                    2: [(Point(1, 1), -1), (Point(0, 2), -1)],
+                    3: [(Point(1, 2), -1)],
+                    4: [(Point(2, 2), -1)]}
+        self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_ranged_units_only(origin, 4))
+
+    def test_get_attack_ranges_ranged_units_only_with_obstacles_some_units_placed(self):
+        points_to_elevation = {Point(0, 0): 0, Point(1, 0): 5, Point(2, 0): 0,
+                               Point(0, 1): 1, Point(1, 1): 1, Point(2, 1): 2,
+                               Point(0, 2): 2, Point(1, 2): 4, Point(2, 2): 4}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        for value in range(3):
+            the_map.place_unit(Soldier(), Point(value, value))
+        origin = Point(0, 0)
+        expected = {0: [(origin, 0)],
+                    1: [],
+                    2: [(Point(1, 1), -1)],
+                    3: [],
+                    4: [(Point(2, 2), -1)]}
+        self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_ranged_units_only(origin, 4))
 
     def test_get_attack_ranges_melee_target_advantage_values(self):
         points_to_elevation = {Point(0, 0): 0, Point(1, 0): -1, Point(2, 0): 1,
@@ -262,6 +360,114 @@ class TestRangeFinder(unittest.TestCase):
         expected = {0: [(origin, 0)],
                     1: [(Point(1, 0), -1)]}
         self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_melee(origin, 1))
+
+    def test_get_attack_ranges_melee_units_only_all_points_occupied(self):
+        points_to_elevation = {Point(0, 0): 0, Point(1, 0): -1, Point(2, 0): 1,
+                               Point(0, 1): 1, Point(1, 1): 2, Point(2, 1): 2,
+                               Point(0, 2): 2, Point(1, 2): 4, Point(2, 2): 4}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        for pt in points_to_elevation.keys():
+            the_map.place_unit(Soldier(), pt)
+        origin = Point(1, 1)
+        expected = {0: [(origin, 0)],
+                    1: [(Point(1, 0), 1), (Point(0, 1), 1), (Point(2, 1), 0), (Point(1, 2), -1)],
+                    2: [(Point(0, 0), 1), (Point(2, 0), 1), (Point(0, 2), 0), (Point(2, 2), -1)]}
+        self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_melee_units_only(origin, 2))
+
+    def test_get_attack_ranges_melee_units_only_no_points_occupied(self):
+        points_to_elevation = {Point(0, 0): 0, Point(1, 0): -1, Point(2, 0): 1,
+                               Point(0, 1): 1, Point(1, 1): 2, Point(2, 1): 2,
+                               Point(0, 2): 2, Point(1, 2): 4, Point(2, 2): 4}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+
+        origin = Point(1, 1)
+        expected = {key: [] for key in range(3)}
+        self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_melee_units_only(origin, 2))
+
+    def test_get_attack_ranges_melee_units_only_some_points_occupied(self):
+        points_to_elevation = {Point(0, 0): 0, Point(1, 0): -1, Point(2, 0): 1,
+                               Point(0, 1): 1, Point(1, 1): 2, Point(2, 1): 2,
+                               Point(0, 2): 2, Point(1, 2): 4, Point(2, 2): 4}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        for value in range(3):
+            the_map.place_unit(Soldier(), Point(value, value))
+        origin = Point(1, 1)
+        expected = {0: [(origin, 0)],
+                    1: [],
+                    2: [(Point(0, 0), 1), (Point(2, 2), -1)]}
+        self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_melee_units_only(origin, 2))
+
+    def test_get_attack_ranges_melee_units_only_target_too_high(self):
+        points_to_elevation = {Point(0, 0): 1, Point(1, 0): 4,
+                               Point(0, 1): 5}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        for pt in points_to_elevation.keys():
+            the_map.place_unit(Soldier(), pt)
+        origin = Point(0, 0)
+        expected = {0: [(origin, 0)],
+                    1: [(Point(1, 0), -1)]}
+        self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_melee_units_only(origin, 1))
+
+    def test_get_attack_ranges_melee_units_only_target_too_low(self):
+        points_to_elevation = {Point(0, 0): 1, Point(1, 0): -3,
+                               Point(0, 1): -2}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        for pt in points_to_elevation.keys():
+            the_map.place_unit(Soldier(), pt)
+        origin = Point(0, 0)
+        expected = {0: [(origin, 0)],
+                    1: [(Point(0, 1), 1)]}
+        self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_melee_units_only(origin, 1))
+
+    def test_get_attack_ranges_melee_units_only_default_distance(self):
+        points_to_elevation = {Point(0, 0): -2, Point(1, 0): -1, Point(2, 0): 1,
+                               Point(0, 1): 1, Point(1, 1): 2, Point(2, 1): 2,
+                               Point(0, 2): -1, Point(1, 2): 4, Point(2, 2): 0}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        for pt in points_to_elevation.keys():
+            the_map.place_unit(Soldier(), pt)
+        origin = Point(1, 1)
+        expected = {0: [(origin, 0)],
+                    1: [(Point(1, 0), 1), (Point(0, 1), 1), (Point(2, 1), 0), (Point(1, 2), -1)]}
+        self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_melee_units_only(origin))
+
+    def test_get_attack_ranges_melee_units_only_set_distance_value(self):
+        points_to_elevation = {Point(0, 0): -2, Point(1, 0): -1, Point(2, 0): 1,
+                               Point(0, 1): 1, Point(1, 1): 2, Point(2, 1): 2,
+                               Point(0, 2): -1, Point(1, 2): 4, Point(2, 2): 0}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        for pt in points_to_elevation.keys():
+            the_map.place_unit(Soldier(), pt)
+        origin = Point(1, 1)
+        expected = {0: [(origin, 0)],
+                    1: [(Point(1, 0), 1), (Point(0, 1), 1), (Point(2, 1), 0), (Point(1, 2), -1)],
+                    2: [(Point(2, 0), 1), (Point(0, 2), 1), (Point(2, 2), 1)]}
+        self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_melee_units_only(origin, 2))
+
+    def test_get_attack_ranges_melee_units_only_set_distance_value_with_obstacle(self):
+        points_to_elevation = {Point(0, 0): 0, Point(1, 0): 5, Point(2, 0): 0,
+                               Point(0, 1): 1, Point(1, 1): 1, Point(2, 1): 2,
+                               Point(0, 2): 2, Point(1, 2): 3, Point(2, 2): 3}
+        tiles = [Tile(elevation=elevation, point=point) for point, elevation in points_to_elevation.items()]
+        the_map = Map(3, 3, tiles)
+        for pt in points_to_elevation.keys():
+            the_map.place_unit(Soldier(), pt)
+        origin = Point(0, 0)
+        expected = {0: [(origin, 0)],
+                    1: [(Point(0, 1), -1)],
+                    2: [(Point(1, 1), -1), (Point(0, 2), -1)],
+                    3: [(Point(1, 2), -1)],
+                    4: [(Point(2, 2), -1)]}
+        self.assertEqual(expected, RangeFinder(the_map).get_attack_ranges_melee_units_only(origin, 4))
+
+
 
 
 def pretty_print(answer):

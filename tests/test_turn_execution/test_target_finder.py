@@ -1,6 +1,10 @@
 import unittest
+import time
+
 
 from battle.turn_execution.target_finder import TargetFinder
+
+from battle.rangefinder import RangeFinder
 
 
 from battle.maptools.map import Map
@@ -75,6 +79,28 @@ class TestTargetFinder(unittest.TestCase):
 
     def test_allies_in_sight_only_allies_in_unobstructed_view(self):
         pass
+
+    # def test_time_demonstration(self):
+    #     rf = RangeFinder(self.map)
+    #     all_units = self.a_units + self.b_units
+    #     for index, unit in enumerate(all_units):
+    #         self.map.place_unit(unit, Point(index, index))
+    #     test_unit = all_units[0]
+    #
+    #     start = time.clock()
+    #     rf.get_all_usable_points(Point(0, 0), 10)
+    #     mid = time.clock() - start
+    #
+    #     start = time.clock()
+    #     rf.get_sight_ranges(Point(0, 0), 10)
+    #     end = time.clock() - start
+    #     print('mid ', mid)
+    #     print('end ', end)
+    #
+    #
+    #
+    #     self.assertEqual(test_unit.get_sight_range(), 10)
+    #
 
 
 

@@ -6,6 +6,8 @@ from battle.maptools.map import Map
 from battle.rangefinder import RangeFinder
 
 
+from itertools import chain
+
 class TargetFinder(object):
     def __init__(self, map_: Map, teams: List[Team]):
         self._map = map_
@@ -21,21 +23,21 @@ class TargetFinder(object):
         """{unit: distance}"""
         allies_to_distances = {}
         sight_range = unit.get_sight_range()
-        distance_to_points = self._rf.get_sight_ranges(self._map.get_point(unit), sight_range)
+        distance_to_points = self._rf.get_sight_ranges_units_only(self._map.get_point(unit), sight_range)
+        ally_team = self.get_team(unit)
         del distance_to_points[0]
+
         for distance, points in distance_to_points.items():
             for point in points:
                 possible = self._map.get_unit(point)
-                if possible is not None:
-                    team = self.get_team(possible)
-                    if team == self.get_team(unit):
-                        allies_to_distances[possible] = distance
+                if ally_team.is_on_team(possible):
+                    allies_to_distances[possible] = distance
         return allies_to_distances
 
     def enemies_in_sight(self, unit: Soldier):
         """{unit: distance}"""
         output = {}
-        distance_to_points = self._rf.get_sight_ranges(self._map.get_point(unit), 10)
+        distance_to_points = self._rf.get_sight_ranges_units_only(self._map.get_point(unit), 10)
         for distance, points in distance_to_points:
             for point in points:
                 possible = self._map.get_unit(point)
