@@ -4,6 +4,10 @@ from battle.players.units import Soldier, Base
 
 
 class Team(object):
+    """
+    WARNING:   You must use `spawn()` to place a unit from a team. Using both  `Map.place_unit` and `spawn`
+    creates errors.
+    """
     def __init__(self, home: Point, map_: Map):
         self._placed_units = []
         self._unplaced_units = []
@@ -46,6 +50,10 @@ class Team(object):
         return player in self.deployed + self.undeployed
 
     def spawn(self):
+        """
+            WARNING:   You must use `spawn()` to place a unit from a team. Using both  `Map.place_unit` and `spawn`
+            creates errors.
+            """
         if not self._unplaced_units:
             raise ValueError('No unplaced units!')
         unit = self._unplaced_units.pop(0)
