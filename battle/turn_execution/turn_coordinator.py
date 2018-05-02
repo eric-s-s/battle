@@ -8,40 +8,56 @@ from battle.players.units import Soldier
 from battle.perimiterlistener import PerimeterListener
 from battle.rangefinder import RangeFinder
 from battle.movementcalculator import MovementCalculator
+from battle.turn_execution.target_finder import TargetFinder
 
 
 class Actionator(object):
-    def __init__(self, unit: Soldier, action, perimeter_listener: PerimeterListener, map_: Map, team: Team):
+    def __init__(self, unit: Soldier, action, perimeter_listener: PerimeterListener, map_: Map, teams: list):
         self._unit = unit
         self._action = action
         self._pl = perimeter_listener
         self._map = map_
-        self._team = team
+        self._mc = MovementCalculator(self._map)
+        self._teams = teams[:]
 
     def _get_targets_in_range(self):
-        rf = RangeFinder(self._map)
-        weapon = self._unit.get_weapon()
-        # TODO: assuming ranged weapon!!!
-        pt = self._map.get_point(self._unit)
-        target = []
-        for dist, pt_advantage in rf.get_attack_ranges_ranged(pt, weapon.range).items():
-            for pt, advantage in pt_advantage:
-                enemy = self._map.get_unit(pt)
-                if enemy is not None and not self._team.is_on_team(enemy):
-                    target.append((enemy, advantage))
-        return target  # List[(enemy, advantage)]
+        tf = TargetFinder(self._map, self._teams)
+        return tf.enemies_in_range(self._unit)
 
     def _get_targets_in_sight(self):
-        rf = RangeFinder(self._map)
+        tf = TargetFinder(self._map, self._teams)
+        return tf.enemies_in_sight(self._unit)
 
-        pt = self._map.get_point(self._unit)
-        target = []
-        for dist, pt_advantage in rf.get_sight_ranges(pt, self._unit.get_perimeter_size()).items():  # TODO: what is sight range?
-            for pt, advantage in pt_advantage:
-                other = self._map.get_unit(pt)
-                if other is not None:
-                    target.append((other, self._team.is_on_team(self._unit)))
-        return target  # List[(unit, is_on_team)]
+    def move(self):
+        """
+                        get location
+                        get path  list of points
+                            sigh range, enemy ally
+                            attack range, enemy
+
+
+                        for point in path:
+                            check pl
+                        jump to destination
+                        set pl
+
+                        pseudo-code
+                        """
+
+    def attack(self):
+        pass
+
+    def get_target(self):
+        self._get_targets_in_range()
+        self._get_targets_in_sight()
+
+    def get_path(self):
+        max_mv = self._get_max_mv()
+        self._mc.get_movement_points_with_path(self._map.get_point(self._unit), max_mv)
+
+    def _get_max_mv(self):
+        return self._unit.get_action_points()
+
 
     """
     hw - type out in pseudo-code, how you will decide where someone moves and how far?
@@ -80,25 +96,7 @@ class Actionator(object):
 
 
 
-    def move(self, path):
-        """
-                get location
-                get path  list of points
-                    sigh range, enemy ally
-                    attack range, enemy
 
-
-                for point in path:
-                    check pl
-                jump to destination
-                set pl
-
-                pseudo-code
-                """
-        pass
-
-    def attack(self):
-        pass
 
 
 

@@ -1,6 +1,6 @@
 from battle.players.team import Team
 from battle.players.units import Soldier
-from battle.maptools.map import Map
+from battle.maptools.map import Map, MapPlacementError
 from battle.maptools.tile import Tile
 from battle.maptools.point import Point
 import unittest
@@ -157,3 +157,10 @@ class TestTeam(unittest.TestCase):
         unit = Soldier()
         self.team.add_player(unit)
         self.assertEqual(self.team.spawn(), (unit, Point(1, 0)))
+
+    def test_place_unit_and_then_spawn_raises_error(self):
+        unit = Soldier()
+        self.team.add_player(unit)
+        self.map.place_unit(unit, Point(1, 0))
+
+        self.assertRaises(MapPlacementError, self.team.spawn)
