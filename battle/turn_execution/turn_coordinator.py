@@ -17,6 +17,7 @@ class Actionator(object):
         self._action = action
         self._pl = perimeter_listener
         self._map = map_
+        self._mc = MovementCalculator(self._map)
         self._teams = teams[:]
 
     def _get_targets_in_range(self):
@@ -47,13 +48,15 @@ class Actionator(object):
         pass
 
     def get_target(self):
-        pass
+        self._get_targets_in_range()
+        self._get_targets_in_sight()
 
     def get_path(self):
-        pass
+        max_mv = self._get_max_mv()
+        self._mc.get_movement_points_with_path(self._map.get_point(self._unit), max_mv)
 
-
-
+    def _get_max_mv(self):
+        return self._unit.get_action_points()
 
 
     """
