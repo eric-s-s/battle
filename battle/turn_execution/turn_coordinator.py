@@ -9,10 +9,11 @@ from battle.perimiterlistener import PerimeterListener
 from battle.rangefinder import RangeFinder
 from battle.movementcalculator import MovementCalculator
 from battle.turn_execution.target_finder import TargetFinder
+from battle.players.action import Action
 
 
 class Actionator(object):
-    def __init__(self, unit: Soldier, action, perimeter_listener: PerimeterListener, map_: Map, teams: list):
+    def __init__(self, unit: Soldier, action: Action, perimeter_listener: PerimeterListener, map_: Map, teams: list):
         self._unit = unit
         self._action = action
         self._pl = perimeter_listener
@@ -27,6 +28,12 @@ class Actionator(object):
     def _get_targets_in_sight(self):
         tf = TargetFinder(self._map, self._teams)
         return tf.enemies_in_sight(self._unit)
+    
+    def go(self):
+        if self._action.has_any(Action.ATTACK):
+            self.attack()
+        else:
+            self.move()
 
     def move(self):
         """
@@ -95,13 +102,6 @@ class Actionator(object):
     """
 
 
-
-
-
-
-
-
-
 class TurnCoordinator(object):
     def __init__(self, map_: Map, team_1: Team, team_2: Team):
         self._map = map_
@@ -132,3 +132,15 @@ class TurnCoordinator(object):
         ally_vector = vectors.get(ally, DangerOpportunity.empty())
         enemy_vector = vectors.get(enemy, DangerOpportunity.empty())
         return unit.strategy.get_action(ally_vector, enemy_vector)
+
+    def do_actions(self, unit: Soldier):
+        action_list = self.get_action_list(unit)
+        while unit.get_action_points():
+            for action in action_list:
+                actionator = Actionator(unit, action, self._pm, self._map, [self._team_1, self._team_2])
+                actionator.go()
+                
+    def one_turn(self):
+        self.create_turn_order()
+        for unit in self._unmoved_units:
+            self.do_actions(unit)
