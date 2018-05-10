@@ -230,3 +230,17 @@ class TestDirection(unittest.TestCase):
         self.assertRaises(ValueError, CompositeDirection, E, W)
         self.assertRaises(ValueError, CompositeDirection, N, S, E, W)
         self.assertRaises(ValueError, CompositeDirection, N, N, S, S, E, W)
+
+    def test_CompositeDirection_is_unit_vector(self):
+
+        test = CompositeDirection(N, N, W)
+        self.assertAlmostEqual(sum(val**2 for val in test.value), 1.0, places=7)
+
+        test = CompositeDirection(S, S, E, S)
+        self.assertAlmostEqual(sum(val**2 for val in test.value), 1.0, places=7)
+
+        test = CompositeDirection(W, W, N)
+        self.assertAlmostEqual(sum(val**2 for val in test.value), 1.0, places=7)
+
+        test = CompositeDirection(S, S, W, W, W)
+        self.assertAlmostEqual(sum(val**2 for val in test.value), 1.0, places=7)
