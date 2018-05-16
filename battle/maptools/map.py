@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
 
 from battle.maptools.direction import Direction
 from battle.maptools.point import Point
@@ -61,7 +61,7 @@ class Map(object):
     def has_tile(self, point: Point) -> bool:
         return self.is_on_map(point) and self._tiles[point]
 
-    def get_tile(self, point: Point) -> Tile:
+    def get_tile(self, point: Point) -> Optional[Tile]:
         return self._tiles[point]
 
     def can_place_unit(self, point: Point) -> bool:
@@ -76,7 +76,7 @@ class Map(object):
         if not self.can_place_unit(point) or self.get_point(unit):
             raise MapPlacementError('illegal unit placement')
 
-    def get_unit(self, point: Point) -> Soldier:
+    def get_unit(self, point: Point) -> Optional[Soldier]:
         return self._points_to_units.get(point)
 
     def get_point(self, unit: Soldier) -> Point:
